@@ -14,6 +14,11 @@ export default function MapPage() {
   const [loading, setLoading] = useState(true);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [heatmapData, setHeatmapData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const searchMarkerRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
   const pollRef = useRef(null);
 
   useEffect(() => { loadMapData(); }, [filter]);
@@ -162,6 +167,50 @@ export default function MapPage() {
     }
   }, [showHeatmap, heatmapData]);
 
+  // Location search using Nominatim
+  function handleSearchInput(value) {
+    setSearchQuery(value);
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    if (value.length < 3) { setSearchResults([]); return; }
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&format=json&limit=5&countrycodes=in`,
+          { headers: { 'User-Agent': 'SmartAlloc/1.0' } }
+        );
+        const data = await res.json();
+        setSearchResults(data);
+      } catch (e) {
+        console.error('Search failed:', e);
+      }
+      setSearching(false);
+    }, 400);
+  }
+
+  function flyToLocation(lat, lon, name) {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    // Remove old search marker
+    if (searchMarkerRef.current) {
+      map.removeLayer(searchMarkerRef.current);
+    }
+
+    map.flyTo([lat, lon], 14, { duration: 1.5 });
+
+    // Add a pulsing search marker
+    searchMarkerRef.current = L.circleMarker([lat, lon], {
+      radius: 12, fillColor: '#FBBF24', color: '#F59E0B',
+      weight: 3, opacity: 1, fillOpacity: 0.4,
+    }).addTo(map);
+    searchMarkerRef.current.bindPopup(`<b>📍 ${name}</b>`).openPopup();
+
+    setSearchQuery(name);
+    setSearchResults([]);
+  }
+
   const categories = ['medical', 'food', 'shelter', 'water', 'rescue', 'education', 'clothing', 'sanitation'];
   const catIcons = { medical: '🏥', food: '🍚', shelter: '🏠', water: '💧', rescue: '🚨', education: '📚', clothing: '👕', sanitation: '🧹' };
 
@@ -204,6 +253,63 @@ export default function MapPage() {
               {catIcons[cat]} {cat}
             </button>
           ))}
+        </div>
+
+        {/* Search Bar */}
+        <div style={{ position: 'relative', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input
+              type="text"
+              placeholder="🔍 Search location (e.g. Dharavi, Mumbai, Kurla)"
+              value={searchQuery}
+              onChange={e => handleSearchInput(e.target.value)}
+              style={{
+                flex: 1, padding: '10px 16px', borderRadius: '10px',
+                border: '1px solid var(--border-color)', background: 'var(--bg-input)',
+                color: 'var(--text-primary)', fontSize: '14px', outline: 'none',
+              }}
+            />
+            {searchQuery && (
+              <button className="btn btn-outline btn-sm" onClick={() => {
+                setSearchQuery(''); setSearchResults([]);
+                if (searchMarkerRef.current && mapInstanceRef.current) {
+                  mapInstanceRef.current.removeLayer(searchMarkerRef.current);
+                  searchMarkerRef.current = null;
+                }
+              }}>✕</button>
+            )}
+          </div>
+          {/* Search Results Dropdown */}
+          {searchResults.length > 0 && (
+            <div style={{
+              position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000,
+              background: 'var(--bg-card)', border: '1px solid var(--border-color)',
+              borderRadius: '10px', marginTop: '4px', overflow: 'hidden',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+            }}>
+              {searchResults.map((r, i) => (
+                <div
+                  key={i}
+                  onClick={() => flyToLocation(parseFloat(r.lat), parseFloat(r.lon), r.display_name.split(',')[0])}
+                  style={{
+                    padding: '10px 16px', cursor: 'pointer', fontSize: '13px',
+                    borderBottom: i < searchResults.length - 1 ? '1px solid var(--border-color)' : 'none',
+                    transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <div style={{ fontWeight: 600 }}>📍 {r.display_name.split(',').slice(0, 2).join(', ')}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+                    {r.display_name}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {searching && (
+            <div style={{ position: 'absolute', right: '60px', top: '10px', fontSize: '12px', color: 'var(--text-muted)' }}>Searching...</div>
+          )}
         </div>
 
         {/* Map */}
