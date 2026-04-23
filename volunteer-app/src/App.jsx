@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Outlet } from 'react-router-dom';
 import { createContext, useContext, useState } from 'react';
+import { Home, ClipboardList, Map as MapIcon, AlertTriangle, User } from 'lucide-react';
 import { auth as authApi, setToken, clearAuth, getStoredUser, setStoredUser } from './services/api';
 import HomePage from './pages/HomePage';
 import TasksPage from './pages/TasksPage';
@@ -39,19 +40,19 @@ function BottomNav() {
   return (
     <nav className="bottom-nav">
       <NavLink to="/" end className={({ isActive }) => isActive ? 'active' : ''}>
-        <span className="nav-icon">🏠</span>Home
+        <Home className="nav-icon" size={24} style={{ marginBottom: '4px' }} />Home
       </NavLink>
       <NavLink to="/tasks" className={({ isActive }) => isActive ? 'active' : ''}>
-        <span className="nav-icon">📋</span>Tasks
+        <ClipboardList className="nav-icon" size={24} style={{ marginBottom: '4px' }} />Tasks
       </NavLink>
       <NavLink to="/map" className={({ isActive }) => isActive ? 'active' : ''}>
-        <span className="nav-icon">🗺️</span>Map
+        <MapIcon className="nav-icon" size={24} style={{ marginBottom: '4px' }} />Map
       </NavLink>
       <NavLink to="/report" className={({ isActive }) => isActive ? 'active' : ''}>
-        <span className="nav-icon">🆘</span>Report
+        <AlertTriangle className="nav-icon" size={24} style={{ marginBottom: '4px' }} />Report
       </NavLink>
       <NavLink to="/profile" className={({ isActive }) => isActive ? 'active' : ''}>
-        <span className="nav-icon">👤</span>Profile
+        <User className="nav-icon" size={24} style={{ marginBottom: '4px' }} />Profile
       </NavLink>
     </nav>
   );

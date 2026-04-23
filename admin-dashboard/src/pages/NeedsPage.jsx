@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { needs } from '../services/api';
+import { 
+  ClipboardList, BrainCircuit, 
+  Stethoscope, Utensils, Home, Droplets, Siren, BookOpen, Shirt, Trash2
+} from 'lucide-react';
 
 export default function NeedsPage() {
   const [data, setData] = useState([]);
@@ -46,12 +50,12 @@ export default function NeedsPage() {
     );
   };
 
-  const catIcons = { medical: '🏥', food: '🍚', shelter: '🏠', water: '💧', rescue: '🚨', education: '📚', clothing: '👕', sanitation: '🧹', other: '📋' };
+  const catIcons = { medical: Stethoscope, food: Utensils, shelter: Home, water: Droplets, rescue: Siren, education: BookOpen, clothing: Shirt, sanitation: Trash2, other: ClipboardList };
 
   return (
     <>
       <div className="page-header">
-        <div><h2>Need Tracker</h2><div className="subtitle">{data.length} community needs</div></div>
+        <div><h2><ClipboardList size={22} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'text-bottom' }} /> Need Tracker</h2><div className="subtitle">{data.length} community needs</div></div>
       </div>
 
       <div className="page-body">
@@ -60,7 +64,7 @@ export default function NeedsPage() {
           <select className="form-select" value={filters.category} onChange={e => setFilters({ ...filters, category: e.target.value })}>
             <option value="">All Categories</option>
             {['medical','food','shelter','water','rescue','education','clothing','sanitation','other'].map(c => (
-              <option key={c} value={c}>{catIcons[c]} {c}</option>
+              <option key={c} value={c}>{c}</option>
             ))}
           </select>
           <select className="form-select" value={filters.status} onChange={e => setFilters({ ...filters, status: e.target.value })}>
@@ -81,7 +85,7 @@ export default function NeedsPage() {
           <div className="loading"><div className="spinner"></div> Loading...</div>
         ) : data.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">📋</div>
+            <div className="empty-icon" style={{ display: 'flex', justifyContent: 'center', color: 'var(--text-muted)' }}><ClipboardList size={48} /></div>
             <p>No needs found matching your filters.</p>
           </div>
         ) : (
@@ -100,7 +104,9 @@ export default function NeedsPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.map(need => (
+                {data.map(need => {
+                  const CatIcon = catIcons[need.category] || ClipboardList;
+                  return (
                   <tr key={need.id}>
                     <td>
                       <div style={{ fontWeight: 600, maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -109,8 +115,8 @@ export default function NeedsPage() {
                       {need.address && <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{need.address}</div>}
                     </td>
                     <td>
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        {catIcons[need.category] || '📋'} {need.category}
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <CatIcon size={14} /> {need.category}
                       </span>
                     </td>
                     <td>{urgencyBars(need.urgency)}</td>
@@ -123,12 +129,12 @@ export default function NeedsPage() {
                     <td>
                       {need.status === 'open' && (
                         <button className="btn btn-primary btn-sm" onClick={() => navigate(`/matching/${need.id}`)}>
-                          🧠 Match
+                          <BrainCircuit size={14} /> Match
                         </button>
                       )}
                     </td>
                   </tr>
-                ))}
+                )})}
               </tbody>
             </table>
           </div>

@@ -80,14 +80,25 @@ async def create_need(
     db: Session = Depends(get_db),
 ):
     """Create a new community need / request."""
+    final_lat = body.latitude
+    final_lon = body.longitude
+
+    # Auto-geocode if coordinates are missing/default (0,0)
+    if (final_lat == 0.0 and final_lon == 0.0) and body.address and len(body.address.strip()) >= 3:
+        from ..services.geo_service import geocode_address
+        coords = geocode_address(body.address)
+        if coords:
+            final_lat, final_lon = coords
+            logger.info(f"Auto-geocoded need address '{body.address}' -> ({final_lat}, {final_lon})")
+
     need = Need(
         reported_by=current_user.id,
         title=body.title,
         description=body.description,
         category=body.category.value,
         urgency=body.urgency,
-        latitude=body.latitude,
-        longitude=body.longitude,
+        latitude=final_lat,
+        longitude=final_lon,
         address=body.address,
         people_affected=body.people_affected,
         source=body.source.value,

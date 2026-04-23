@@ -2,6 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { analytics } from '../services/api';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { 
+  ClipboardList, AlertCircle, CheckCircle2, Users, UserCheck, 
+  HeartHandshake, BrainCircuit, Download, RefreshCw, BarChart3,
+  Stethoscope, Utensils, Home, Droplets, Siren, BookOpen, Shirt, Trash2
+} from 'lucide-react';
 
 export default function DashboardPage() {
   const [summary, setSummary] = useState(null);
@@ -168,15 +173,15 @@ export default function DashboardPage() {
   const s = summary || {};
 
   const statCards = [
-    { icon: '📋', label: 'Total Needs', value: s.total_needs || 0, color: 'blue' },
-    { icon: '🔴', label: 'Open Needs', value: s.open_needs || 0, color: 'red' },
-    { icon: '✅', label: 'Resolved', value: s.resolved_needs || 0, color: 'green' },
-    { icon: '🙋', label: 'Total Volunteers', value: s.total_volunteers || 0, color: 'purple' },
-    { icon: '🟢', label: 'Active Volunteers', value: s.active_volunteers || 0, color: 'green' },
-    { icon: '👥', label: 'People Helped', value: s.people_helped || 0, color: 'cyan' },
+    { icon: ClipboardList, label: 'Total Needs', value: s.total_needs || 0, color: 'blue' },
+    { icon: AlertCircle, label: 'Open Needs', value: s.open_needs || 0, color: 'red' },
+    { icon: CheckCircle2, label: 'Resolved', value: s.resolved_needs || 0, color: 'green' },
+    { icon: Users, label: 'Total Volunteers', value: s.total_volunteers || 0, color: 'purple' },
+    { icon: UserCheck, label: 'Active Volunteers', value: s.active_volunteers || 0, color: 'green' },
+    { icon: HeartHandshake, label: 'People Helped', value: s.people_helped || 0, color: 'cyan' },
   ];
 
-  const catIcons = { medical: '🏥', food: '🍚', shelter: '🏠', water: '💧', rescue: '🚨', education: '📚', clothing: '👕', sanitation: '🧹', other: '📋' };
+  const catIcons = { medical: Stethoscope, food: Utensils, shelter: Home, water: Droplets, rescue: Siren, education: BookOpen, clothing: Shirt, sanitation: Trash2, other: ClipboardList };
   const catColors = { medical: '#EF4444', food: '#F97316', shelter: '#3B82F6', water: '#06B6D4', rescue: '#A855F7', education: '#10B981', clothing: '#EAB308', sanitation: '#14B8A6', other: '#6B7280' };
 
   return (
@@ -188,43 +193,55 @@ export default function DashboardPage() {
             Real-time command center for volunteer coordination
             {lastUpdated && (
               <span style={{ marginLeft: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
-                🟢 Live • Updated {lastUpdated.toLocaleTimeString()}
+                <span style={{ display: 'inline-block', width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', marginRight: '4px' }}></span>
+                Live • Updated {lastUpdated.toLocaleTimeString()}
               </span>
             )}
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn btn-outline" onClick={exportPDF} title="Download PDF Report">📄 Export PDF</button>
-          <button className="btn btn-primary" onClick={() => loadData()}>↻ Refresh</button>
+          <button className="btn btn-outline" onClick={exportPDF} title="Download PDF Report">
+            <Download size={16} /> Export PDF
+          </button>
+          <button className="btn btn-primary" onClick={() => loadData()}>
+            <RefreshCw size={16} /> Refresh
+          </button>
         </div>
       </div>
 
       <div className="page-body">
         {/* Stats Grid */}
         <div className="stats-grid">
-          {statCards.map((card, i) => (
-            <div className="stat-card" key={i}>
-              <div className={`stat-icon ${card.color}`}>{card.icon}</div>
-              <div className="stat-info">
-                <h3>{card.value}</h3>
-                <div className="stat-label">{card.label}</div>
+          {statCards.map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <div className="stat-card" key={i}>
+                <div className={`stat-icon ${card.color}`}>
+                  <Icon size={24} />
+                </div>
+                <div className="stat-info">
+                  <h3>{card.value}</h3>
+                  <div className="stat-label">{card.label}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* AI Summary Section */}
         <div className="card" style={{ marginBottom: '24px' }}>
           <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span className="card-title">🤖 AI Situation Analysis</span>
+            <span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <BrainCircuit size={18} /> AI Situation Analysis
+            </span>
             <button
               className="btn btn-sm btn-primary"
               onClick={loadAISummary}
               disabled={aiLoading}
               style={{ fontSize: '12px' }}
             >
-              {aiLoading ? '🔄 Analyzing...' : aiSummary ? '↻ Refresh Analysis' : '🧠 Generate AI Analysis'}
+              {aiLoading ? <><RefreshCw size={14} className="spin" /> Analyzing...</> : aiSummary ? <><RefreshCw size={14} /> Refresh Analysis</> : <><BrainCircuit size={14} /> Generate AI Analysis</>}
             </button>
           </div>
           {aiSummary ? (
@@ -247,40 +264,47 @@ export default function DashboardPage() {
           {/* Impact Dashboard */}
           <div className="card">
             <div className="card-header">
-              <span className="card-title">📊 7-Day Impact Report</span>
+              <span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BarChart3 size={18} /> 7-Day Impact Report
+              </span>
             </div>
             {impact ? (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(16,185,129,0.1)', borderRadius: '10px' }}>
+                <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(16,185,129,0.06)', borderRadius: '12px', border: '1px solid rgba(16,185,129,0.1)' }}>
                   <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--accent-green)' }}>{impact.people_helped}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>People Helped</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 600 }}>People Helped</div>
                 </div>
-                <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(59,130,246,0.1)', borderRadius: '10px' }}>
+                <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(59,130,246,0.06)', borderRadius: '12px', border: '1px solid rgba(59,130,246,0.1)' }}>
                   <div style={{ fontSize: '28px', fontWeight: 800, color: '#3B82F6' }}>{impact.needs_resolved}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>Needs Resolved</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 600 }}>Needs Resolved</div>
                 </div>
-                <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(168,85,247,0.1)', borderRadius: '10px' }}>
+                <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(168,85,247,0.06)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.1)' }}>
                   <div style={{ fontSize: '28px', fontWeight: 800, color: '#A855F7' }}>{impact.avg_response_hours}h</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>Avg Response</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 600 }}>Avg Response</div>
                 </div>
-                <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(239,68,68,0.1)', borderRadius: '10px' }}>
+                <div style={{ textAlign: 'center', padding: '12px', background: 'rgba(239,68,68,0.06)', borderRadius: '12px', border: '1px solid rgba(239,68,68,0.1)' }}>
                   <div style={{ fontSize: '28px', fontWeight: 800, color: '#EF4444' }}>{impact.critical_open_needs}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>Critical Open</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', fontWeight: 600 }}>Critical Open</div>
                 </div>
 
                 {/* Bottom row stats */}
-                <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', fontSize: '12px', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
-                  <span style={{ color: 'var(--text-muted)' }}>📋 {impact.needs_created} needs reported</span>
-                  <span style={{ color: 'var(--text-muted)' }}>🙋 {impact.active_volunteers} active volunteers</span>
-                  <span style={{ color: 'var(--accent-green)' }}>✅ {impact.resolution_rate}% resolved</span>
+                <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'space-between', fontSize: '12px', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
+                  <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}><ClipboardList size={14}/> {impact.needs_created} needs reported</span>
+                  <span style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}><Users size={14}/> {impact.active_volunteers} active volunteers</span>
+                  <span style={{ color: 'var(--accent-green)', display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle2 size={14}/> {impact.resolution_rate}% resolved</span>
                 </div>
 
                 {/* Top categories */}
                 {impact.top_categories?.length > 0 && (
-                  <div style={{ gridColumn: '1 / -1', fontSize: '12px', color: 'var(--text-muted)' }}>
-                    Top needs: {impact.top_categories.map(c =>
-                      `${catIcons[c.category] || '📋'} ${c.category} (${c.count})`
-                    ).join(' • ')}
+                  <div style={{ gridColumn: '1 / -1', fontSize: '12px', color: 'var(--text-muted)', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 600 }}>Top needs:</span> {impact.top_categories.map(c => {
+                      const CatIcon = catIcons[c.category] || ClipboardList;
+                      return (
+                        <span key={c.category} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                          <CatIcon size={12} color={catColors[c.category]} /> {c.category} ({c.count})
+                        </span>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -297,14 +321,17 @@ export default function DashboardPage() {
             {categories.length === 0 ? (
               <div className="empty-state" style={{ padding: '20px' }}>No data yet</div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {categories.map(cat => {
                   const maxCount = Math.max(...categories.map(c => c.count), 1);
                   const pct = (cat.count / maxCount) * 100;
+                  const CatIcon = catIcons[cat.category] || ClipboardList;
                   return (
                     <div key={cat.category}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '4px' }}>
-                        <span>{catIcons[cat.category] || '📋'} {cat.category}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '6px', fontWeight: 500 }}>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <CatIcon size={14} color={catColors[cat.category] || '#6B7280'} /> {cat.category}
+                        </span>
                         <span style={{ color: 'var(--text-secondary)' }}>{cat.count} ({cat.open_count} open)</span>
                       </div>
                       <div style={{ height: '6px', background: 'var(--bg-input)', borderRadius: '3px', overflow: 'hidden' }}>
@@ -326,25 +353,25 @@ export default function DashboardPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '20px', fontWeight: 700 }}>{s.avg_response_time_hours ? `${s.avg_response_time_hours}h` : '—'}</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Avg Response Time</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Avg Response Time</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '20px', fontWeight: 700 }}>{s.in_progress_needs || 0}</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>In Progress</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>In Progress</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '20px', fontWeight: 700 }}>{s.completed_assignments || 0}</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Completed Tasks</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Completed Tasks</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '20px', fontWeight: 700 }}>{s.busy_volunteers || 0}</div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Busy Volunteers</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Busy Volunteers</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--accent-green)' }}>
                 {s.total_needs > 0 ? `${Math.round((s.resolved_needs / s.total_needs) * 100)}%` : '—'}
               </div>
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Resolution Rate</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '4px' }}>Resolution Rate</div>
             </div>
           </div>
         </div>

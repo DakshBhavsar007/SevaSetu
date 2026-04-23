@@ -1,15 +1,16 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
+import { LayoutDashboard, ClipboardList, Map, Users, BrainCircuit, ScanLine, Radio, Rocket, Sun, Moon, LogOut } from 'lucide-react';
 
 const navItems = [
-  { path: '/', icon: '📊', label: 'Dashboard' },
-  { path: '/needs', icon: '📋', label: 'Need Tracker' },
-  { path: '/map', icon: '🗺️', label: 'Live Map' },
-  { path: '/volunteers', icon: '🙋', label: 'Volunteers' },
-  { path: '/matching', icon: '🧠', label: 'Smart Match' },
-  { path: '/ocr', icon: '📷', label: 'OCR Scanner' },
-  { path: '/broadcast', icon: '📡', label: 'Broadcast' },
+  { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/needs', icon: ClipboardList, label: 'Need Tracker' },
+  { path: '/map', icon: Map, label: 'Live Map' },
+  { path: '/volunteers', icon: Users, label: 'Volunteers' },
+  { path: '/matching', icon: BrainCircuit, label: 'Smart Match' },
+  { path: '/ocr', icon: ScanLine, label: 'OCR Scanner' },
+  { path: '/broadcast', icon: Radio, label: 'Broadcast' },
 ];
 
 export default function Layout() {
@@ -25,22 +26,25 @@ export default function Layout() {
     <div className="app-layout">
       <aside className="sidebar">
         <div className="sidebar-logo">
-          <span className="logo-icon">🚀</span>
+          <Rocket className="logo-icon text-accent" size={24} />
           <h1>SmartAlloc</h1>
         </div>
 
         <nav className="sidebar-nav">
-          {navItems.map(item => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === '/'}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-            >
-              <span className="nav-icon">{item.icon}</span>
-              {item.label}
-            </NavLink>
-          ))}
+          {navItems.map(item => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                end={item.path === '/'}
+                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+              >
+                <Icon className="nav-icon" size={20} />
+                {item.label}
+              </NavLink>
+            );
+          })}
         </nav>
 
         <div className="sidebar-footer">
@@ -50,18 +54,18 @@ export default function Layout() {
               className={theme === 'light' ? 'active' : ''}
               onClick={() => setTheme('light')}
             >
-              ☀️ Light
+              <Sun size={14} style={{ marginRight: '6px' }} /> Light
             </button>
             <button
               className={theme === 'dark' ? 'active' : ''}
               onClick={() => setTheme('dark')}
             >
-              🌙 Dark
+              <Moon size={14} style={{ marginRight: '6px' }} /> Dark
             </button>
           </div>
 
           {/* User Info */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px', marginTop: '16px' }}>
             {user?.picture ? (
               <img src={user.picture} alt="" style={{ width: 36, height: 36, borderRadius: '50%' }} />
             ) : (
@@ -74,13 +78,13 @@ export default function Layout() {
                 {user?.name?.[0] || 'A'}
               </div>
             )}
-            <div>
-              <div style={{ fontSize: '13px', fontWeight: 600 }}>{user?.name || 'Dev Admin'}</div>
+            <div style={{ flex: 1, overflow: 'hidden' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.name || 'Dev Admin'}</div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{user?.role || 'admin'}</div>
             </div>
           </div>
-          <button className="btn btn-outline btn-sm" onClick={logout} style={{ width: '100%' }}>
-            Logout
+          <button className="btn btn-outline" onClick={logout} style={{ width: '100%', justifyContent: 'center' }}>
+            <LogOut size={16} /> Logout
           </button>
         </div>
       </aside>

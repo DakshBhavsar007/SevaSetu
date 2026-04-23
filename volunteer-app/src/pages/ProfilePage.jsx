@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../App';
 import { volunteer } from '../services/api';
+import { Sun, Moon, CheckCircle2, Clock, XCircle, Save, LogOut } from 'lucide-react';
 
 function useTheme() {
   const [theme, setTheme] = useState(() => localStorage.getItem('sa-theme') || 'light');
@@ -106,8 +107,12 @@ export default function ProfilePage() {
       <div className="vol-page">
         {/* Theme Toggle */}
         <div className="vol-theme-toggle">
-          <button className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')}>☀️ Light</button>
-          <button className={theme === 'dark' ? 'active' : ''} onClick={() => setTheme('dark')}>🌙 Dark</button>
+          <button className={theme === 'light' ? 'active' : ''} onClick={() => setTheme('light')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+            <Sun size={14} /> Light
+          </button>
+          <button className={theme === 'dark' ? 'active' : ''} onClick={() => setTheme('dark')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+            <Moon size={14} /> Dark
+          </button>
         </div>
 
         {/* Availability Toggle */}
@@ -117,8 +122,8 @@ export default function ProfilePage() {
             <div className="availability-toggle">
               {['available', 'busy', 'offline'].map(s => (
                 <button key={s} className={profile.availability === s ? 'active' : ''}
-                  onClick={() => toggleAvailability(s)}>
-                  {s === 'available' ? '🟢' : s === 'busy' ? '🟡' : '⚫'} {s}
+                  onClick={() => toggleAvailability(s)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                  {s === 'available' ? <CheckCircle2 size={14} /> : s === 'busy' ? <Clock size={14} /> : <XCircle size={14} />} {s}
                 </button>
               ))}
             </div>
@@ -175,12 +180,12 @@ export default function ProfilePage() {
 
         {/* Save */}
         <button className="vol-btn primary" onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving...' : '💾 Save Profile'}
+          {saving ? 'Saving...' : <><Save size={16} /> Save Profile</>}
         </button>
 
         {/* Logout */}
         <button className="vol-btn outline" onClick={logout} style={{ marginTop: '12px' }}>
-          Logout
+          <LogOut size={16} /> Logout
         </button>
       </div>
     </>

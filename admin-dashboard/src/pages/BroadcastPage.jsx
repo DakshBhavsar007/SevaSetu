@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { broadcast } from '../services/api';
+import { Radio, Send, CheckCircle2, History } from 'lucide-react';
 
 export default function BroadcastPage() {
   const [form, setForm] = useState({
@@ -48,7 +49,7 @@ export default function BroadcastPage() {
   return (
     <>
       <div className="page-header">
-        <div><h2>📡 Broadcast Tool</h2><div className="subtitle">Send emergency alerts to volunteers in a radius</div></div>
+        <div><h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Radio size={22} color="var(--accent-red)" /> Broadcast Tool</h2><div className="subtitle">Send emergency alerts to volunteers in a radius</div></div>
       </div>
 
       <div className="page-body">
@@ -96,8 +97,8 @@ export default function BroadcastPage() {
                   <input type="number" step="0.5" className="form-input" value={form.radius_km} onChange={e => setForm({ ...form, radius_km: parseFloat(e.target.value) })} />
                 </div>
               </div>
-              <button type="submit" className="btn btn-danger btn-lg" disabled={sending} style={{ width: '100%' }}>
-                {sending ? '📡 Sending...' : '🚨 Send Broadcast'}
+              <button type="submit" className="btn btn-danger btn-lg" disabled={sending} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                {sending ? <><Radio size={16} /> Sending...</> : <><Send size={16} /> Send Broadcast</>}
               </button>
             </form>
           </div>
@@ -106,7 +107,7 @@ export default function BroadcastPage() {
           <div>
             {result && (
               <div className="card" style={{ marginBottom: '16px', borderColor: 'var(--accent-green)' }}>
-                <div className="card-header"><span className="card-title">✅ Broadcast Sent</span></div>
+                <div className="card-header"><span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><CheckCircle2 size={14} color="var(--accent-green)" /> Broadcast Sent</span></div>
                 <p style={{ fontSize: '14px' }}>
                   <strong>{result.title}</strong><br/>
                   Sent to <strong>{result.recipients_count}</strong> volunteers within {result.radius_km}km
@@ -116,7 +117,7 @@ export default function BroadcastPage() {
 
             <div className="card">
               <div className="card-header">
-                <span className="card-title">History</span>
+                <span className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><History size={14} /> History</span>
                 {!historyLoaded && <button className="btn btn-outline btn-sm" onClick={loadHistory}>Load</button>}
               </div>
               {history.length > 0 ? (

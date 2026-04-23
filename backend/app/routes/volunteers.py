@@ -86,6 +86,17 @@ async def setup_volunteer_profile(
     vol.address = body.address or vol.address
     vol.updated_at = datetime.now(timezone.utc)
 
+    # Auto-geocode address if coordinates are missing/default
+    if (vol.latitude is None or vol.longitude is None or
+        (vol.latitude == 0.0 and vol.longitude == 0.0)):
+        address_to_geocode = vol.address
+        if address_to_geocode and len(address_to_geocode.strip()) >= 3:
+            from ..services.geo_service import geocode_address
+            coords = geocode_address(address_to_geocode)
+            if coords:
+                vol.latitude, vol.longitude = coords
+                logger.info(f"Auto-geocoded volunteer address '{address_to_geocode}' -> ({vol.latitude}, {vol.longitude})")
+
     # Ensure user role is set
     if current_user.role != "volunteer":
         current_user.role = "volunteer"

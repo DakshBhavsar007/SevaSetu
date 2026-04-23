@@ -1,4 +1,5 @@
 import { useAuth } from '../context/AuthContext';
+import { Rocket } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, devLogin, loading } = useAuth();
@@ -16,7 +17,7 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🚀</div>
+        <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center', color: 'var(--accent)' }}><Rocket size={48} /></div>
         <h1>SmartAlloc</h1>
         <p>Admin Dashboard — Volunteer Coordination Platform</p>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { volunteer, assignments } from '../services/api';
+import { Stethoscope, Utensils, Home, Droplets, Siren, BookOpen, Shirt, Trash2, ClipboardList, Check, X, Play } from 'lucide-react';
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState([]);
@@ -38,7 +39,7 @@ export default function TasksPage() {
     }
   }
 
-  const catIcons = { medical: '🏥', food: '🍚', shelter: '🏠', water: '💧', rescue: '🚨', education: '📚', clothing: '👕', sanitation: '🧹', other: '📋' };
+  const catIcons = { medical: Stethoscope, food: Utensils, shelter: Home, water: Droplets, rescue: Siren, education: BookOpen, clothing: Shirt, sanitation: Trash2, other: ClipboardList };
 
   return (
     <>
@@ -66,11 +67,13 @@ export default function TasksPage() {
             <p>No tasks found.</p>
           </div>
         ) : (
-          tasks.map(task => (
+          tasks.map(task => {
+            const CatIcon = catIcons[task.need_category] || ClipboardList;
+            return (
             <div className="vol-card" key={task.id}>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                <div className="task-icon" style={{ background: 'rgba(59,130,246,0.15)' }}>
-                  {catIcons[task.need_category] || '📋'}
+                <div className="task-icon" style={{ background: 'rgba(59,130,246,0.15)', color: 'var(--accent)' }}>
+                  <CatIcon size={20} />
                 </div>
                 <div style={{ flex: 1 }}>
                   <h3 style={{ fontSize: '14px', fontWeight: 600 }}>{task.need_title}</h3>
@@ -84,22 +87,23 @@ export default function TasksPage() {
               {/* Action Buttons */}
               {task.status === 'assigned' && (
                 <div className="action-btns">
-                  <button className="vol-btn success" onClick={() => handleAction(task.id, 'accepted')}>✅ Accept</button>
-                  <button className="vol-btn danger" onClick={() => handleAction(task.id, 'rejected')}>✖ Reject</button>
+                  <button className="vol-btn success" onClick={() => handleAction(task.id, 'accepted')}><Check size={16} /> Accept</button>
+                  <button className="vol-btn danger" onClick={() => handleAction(task.id, 'rejected')}><X size={16} /> Reject</button>
                 </div>
               )}
               {task.status === 'accepted' && (
                 <div className="action-btns">
-                  <button className="vol-btn primary" onClick={() => handleAction(task.id, 'in_progress')}>🚀 Start</button>
+                  <button className="vol-btn primary" onClick={() => handleAction(task.id, 'in_progress')}><Play size={16} /> Start</button>
                 </div>
               )}
               {task.status === 'in_progress' && (
                 <div className="action-btns">
-                  <button className="vol-btn success" onClick={() => handleAction(task.id, 'completed')}>✅ Complete</button>
+                  <button className="vol-btn success" onClick={() => handleAction(task.id, 'completed')}><Check size={16} /> Complete</button>
                 </div>
               )}
             </div>
-          ))
+            );
+          })
         )}
       </div>
     </>

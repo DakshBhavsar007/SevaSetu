@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { matching, needs as needsApi } from '../services/api';
+import { BrainCircuit, UserCheck, MapPin, Award, Frown } from 'lucide-react';
 
 export default function MatchingPage() {
   const { needId } = useParams();
@@ -54,7 +55,7 @@ export default function MatchingPage() {
   return (
     <>
       <div className="page-header">
-        <div><h2>🧠 Smart Matching</h2><div className="subtitle">AI-powered volunteer-to-need matching</div></div>
+        <div><h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><BrainCircuit size={22} color="var(--accent-purple)" /> Smart Matching</h2><div className="subtitle">AI-powered volunteer-to-need matching</div></div>
       </div>
 
       <div className="page-body">
@@ -80,7 +81,7 @@ export default function MatchingPage() {
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <h3 style={{ fontSize: '16px' }}>
-                  Matches for: <span style={{ color: 'var(--accent-blue)' }}>{suggestions.need_title}</span>
+                  Matches for: <span style={{ color: 'var(--accent)' }}>{suggestions.need_title}</span>
                 </h3>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   Category: {suggestions.need_category} · {suggestions.total_available} volunteers available
@@ -90,7 +91,7 @@ export default function MatchingPage() {
 
             {suggestions.suggestions.length === 0 ? (
               <div className="empty-state">
-                <div className="empty-icon">😕</div>
+                <div className="empty-icon" style={{ display: 'flex', justifyContent: 'center', color: 'var(--text-muted)' }}><Frown size={48} /></div>
                 <p>No matching volunteers found. Try broadening the search radius.</p>
               </div>
             ) : (
@@ -111,7 +112,7 @@ export default function MatchingPage() {
                         {(match.volunteer.skills || []).map(s => (
                           <span key={s} style={{
                             fontSize: '10px', padding: '1px 8px', borderRadius: '10px',
-                            background: 'rgba(59,130,246,0.12)', color: 'var(--accent-blue)',
+                            background: 'rgba(59,130,246,0.12)', color: 'var(--accent)',
                           }}>{s}</span>
                         ))}
                       </div>
@@ -121,11 +122,12 @@ export default function MatchingPage() {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', minWidth: '80px' }}>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{match.distance_km.toFixed(1)} km</div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}><MapPin size={12} /> {match.distance_km.toFixed(1)} km</div>
                       <button className="btn btn-primary btn-sm"
                         onClick={() => handleAssign(match.volunteer.id)}
-                        disabled={assigning === match.volunteer.id}>
-                        {assigning === match.volunteer.id ? '...' : '✅ Assign'}
+                        disabled={assigning === match.volunteer.id}
+                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        {assigning === match.volunteer.id ? '...' : <><UserCheck size={14} /> Assign</>}
                       </button>
                     </div>
                   </div>

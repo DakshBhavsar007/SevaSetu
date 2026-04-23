@@ -119,32 +119,32 @@ def calculate_match_score(
     reasons = []
 
     if distance_km <= 2:
-        reasons.append(f"📍 Very close — only {distance_km:.1f} km away")
+        reasons.append(f"Very close — only {distance_km:.1f} km away")
     elif distance_km <= 5:
-        reasons.append(f"📍 Nearby — {distance_km:.1f} km away")
+        reasons.append(f"Nearby — {distance_km:.1f} km away")
     elif distance_km <= 15:
-        reasons.append(f"📍 Moderate distance — {distance_km:.1f} km away")
+        reasons.append(f"Moderate distance — {distance_km:.1f} km away")
     else:
-        reasons.append(f"📍 Far — {distance_km:.1f} km away")
+        reasons.append(f"Far — {distance_km:.1f} km away")
 
     required = CATEGORY_SKILL_MAP.get(need.category, [])
     matched_skills = set(skills) & set(required)
     if matched_skills:
-        reasons.append(f"🎯 Skills match: {', '.join(sorted(matched_skills))}")
+        reasons.append(f"Skills match: {', '.join(sorted(matched_skills))}")
     elif required:
-        reasons.append("⚠️ No matching skills for this category")
+        reasons.append("No matching skills for this category")
 
     if need.category in VEHICLE_BONUS_CATEGORIES and volunteer.has_vehicle:
-        reasons.append(f"🚗 Has {volunteer.vehicle_type or 'vehicle'} for delivery")
+        reasons.append(f"Has {volunteer.vehicle_type or 'vehicle'} for delivery")
 
     if volunteer.availability == "available":
-        reasons.append("✅ Currently available")
+        reasons.append("Currently available")
 
     if volunteer.tasks_completed > 10:
-        reasons.append(f"⭐ Experienced — {volunteer.tasks_completed} tasks completed")
+        reasons.append(f"Experienced — {volunteer.tasks_completed} tasks completed")
 
     if volunteer.rating >= 4.0 and volunteer.total_ratings >= 3:
-        reasons.append(f"⭐ Highly rated — {volunteer.rating:.1f}/5.0")
+        reasons.append(f"Highly rated — {volunteer.rating:.1f}/5.0")
 
     return {
         "total_score": total,
@@ -178,6 +178,22 @@ def find_best_matches(
     if need.latitude is None or need.longitude is None:
         logger.warning(f"Need {need.id} has no coordinates, cannot match.")
         return []
+
+    # Guard against invalid (0,0) default coordinates — try to geocode the address
+    if need.latitude == 0.0 and need.longitude == 0.0:
+        if need.address and len(need.address.strip()) >= 3:
+            from .geo_service import geocode_address
+            coords = geocode_address(need.address)
+            if coords:
+                need.latitude, need.longitude = coords
+                db.commit()
+                logger.info(f"Auto-geocoded need '{need.title}' address '{need.address}' -> ({need.latitude}, {need.longitude})")
+            else:
+                logger.warning(f"Need {need.id} has (0,0) coordinates and geocoding failed for '{need.address}'")
+                return []
+        else:
+            logger.warning(f"Need {need.id} has (0,0) coordinates and no address to geocode.")
+            return []
 
     exclude_ids = set(exclude_volunteer_ids or [])
 

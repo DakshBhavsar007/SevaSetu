@@ -146,23 +146,47 @@ async def extract_and_create_need(
     # Auto-geocode extracted location text
     final_lat = latitude
     final_lon = longitude
-    location_text = structured.get("location_text", "")
-    if location_text and (latitude == 0.0 or longitude == 0.0 or (latitude == 19.076 and longitude == 72.878)):
+    location_text = structured.get("location_text", "") or structured.get("address", "") or ""
+    need_title = structured.get("title") or "OCR Extracted Need"
+
+    # Try geocoding if coordinates are missing/default
+    if final_lat == 0.0 or final_lon == 0.0 or (final_lat == 19.076 and final_lon == 72.878):
         from ..services.geo_service import geocode_address
-        coords = geocode_address(location_text)
+        coords = None
+        # Try location_text first
+        if location_text.strip():
+            coords = geocode_address(location_text)
+            logger.info(f"Geocode attempt with location_text '{location_text}': {coords}")
+        # Fallback: try raw text for any location mentions
+        if not coords and result.get("raw_text", "").strip():
+            coords = geocode_address(result.get("raw_text", ""))
+            logger.info(f"Geocode fallback with raw_text: {coords}")
+        # Fallback: try the title
+        if not coords and need_title:
+            coords = geocode_address(need_title)
+            logger.info(f"Geocode fallback with title '{need_title}': {coords}")
         if coords:
             final_lat, final_lon = coords
+            logger.info(f"Final geocoded coordinates: ({final_lat}, {final_lon})")
+
+    # Build address string
+    final_address = location_text or structured.get("location_text") or ""
+    if not final_address and result.get("raw_text"):
+        # Extract first line as potential address
+        first_line = result.get("raw_text", "").split("\n")[0].strip()
+        if len(first_line) < 100:
+            final_address = first_line
 
     # Create Need from extracted data
     need = Need(
         reported_by=current_user.id,
-        title=structured.get("title") or "OCR Extracted Need",
+        title=need_title,
         description=structured.get("description") or result.get("raw_text", ""),
         category=structured.get("category") or "other",
         urgency=structured.get("urgency") or 3,
-        latitude=final_lat or 0.0,
-        longitude=final_lon or 0.0,
-        address=location_text or structured.get("location_text"),
+        latitude=final_lat,
+        longitude=final_lon,
+        address=final_address,
         people_affected=structured.get("people_affected") or 1,
         source="ocr",
         ocr_raw_text=result.get("raw_text", ""),

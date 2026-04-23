@@ -35,6 +35,22 @@ def _mumbai_coords():
         72.8777 + random.uniform(-0.08, 0.08),
     )
 
+# Gujarat-area coordinates
+def _gujarat_coords():
+    cities = [
+        (22.3072, 73.1812),  # Vadodara
+        (23.0225, 72.5714),  # Ahmedabad
+        (21.1702, 72.8311),  # Surat
+        (22.3039, 70.8022),  # Rajkot
+        (21.7645, 72.1519),  # Bhavnagar
+        (23.2156, 72.6369),  # Gandhinagar
+    ]
+    base_lat, base_lon = random.choice(cities)
+    return (
+        base_lat + random.uniform(-0.03, 0.03),
+        base_lon + random.uniform(-0.03, 0.03),
+    )
+
 
 SKILLS_POOL = [
     "medical", "first_aid", "nursing", "cooking", "driving",
@@ -66,12 +82,27 @@ ADDRESSES = [
     "Kharghar, Navi Mumbai",
 ]
 
+GUJARAT_ADDRESSES = [
+    "Alkapuri, Vadodara",
+    "Fatehgunj, Vadodara",
+    "Sayajigunj, Vadodara",
+    "Maninagar, Ahmedabad",
+    "Navrangpura, Ahmedabad",
+    "Satellite, Ahmedabad",
+    "Isanpur, Ahmedabad",
+    "Adajan, Surat",
+    "Varachha, Surat",
+    "Kalavad Road, Rajkot",
+    "Gandhinagar Sector 21",
+    "Waghawadi Road, Bhavnagar",
+]
+
 
 def seed():
     init_db()
     db = SessionLocal()
 
-    print("🌱 Seeding database with demo data...\n")
+    print("Seeding database with demo data...\n")
 
     # --- ADMIN USER ---
     admin_user = User(
@@ -84,7 +115,7 @@ def seed():
         created_at=_random_past(30),
     )
     db.add(admin_user)
-    print(f"  👤 Admin: {admin_user.name} ({admin_user.email})")
+    print(f"  Admin: {admin_user.name} ({admin_user.email})")
 
     # --- VOLUNTEER USERS + PROFILES ---
     volunteer_names = [
@@ -103,6 +134,18 @@ def seed():
         ("Rajesh Khanna", "rajesh.khanna@email.com"),
         ("Sunita Devi", "sunita.devi@email.com"),
         ("Nikhil Jain", "nikhil.jain@email.com"),
+    ]
+
+    # Gujarat-based volunteers
+    gujarat_volunteer_names = [
+        ("Hardik Patel", "hardik.patel@email.com"),
+        ("Nisha Shah", "nisha.shah@email.com"),
+        ("Kiran Bhatt", "kiran.bhatt@email.com"),
+        ("Darshan Modi", "darshan.modi@email.com"),
+        ("Riya Desai", "riya.desai@email.com"),
+        ("Yash Trivedi", "yash.trivedi@email.com"),
+        ("Priyanka Parmar", "priyanka.parmar@email.com"),
+        ("Jay Chauhan", "jay.chauhan@email.com"),
     ]
 
     volunteers = []
@@ -140,7 +183,44 @@ def seed():
         )
         db.add(vol)
         volunteers.append(vol)
-        print(f"  🙋 Volunteer: {name} | Skills: {skills} | {avail}")
+        print(f"  Volunteer: {name} | Skills: {skills} | {avail}")
+
+    # Gujarat volunteers
+    for i, (name, email) in enumerate(gujarat_volunteer_names):
+        user = User(
+            id=_uuid(),
+            email=email,
+            name=name,
+            role="volunteer",
+            google_id=f"google_guj_demo_{i:03d}",
+            created_at=_random_past(20),
+        )
+        db.add(user)
+
+        lat, lon = _gujarat_coords()
+        skills = random.sample(SKILLS_POOL, k=random.randint(2, 5))
+        has_vehicle = random.choice([True, False, False])
+        avail = random.choices(["available", "busy", "offline"], weights=[60, 20, 20])[0]
+
+        vol = Volunteer(
+            id=_uuid(),
+            user_id=user.id,
+            phone=f"+91-9{random.randint(100000000, 999999999)}",
+            skills=json.dumps(skills),
+            has_vehicle=has_vehicle,
+            vehicle_type=random.choice(["bike", "car"]) if has_vehicle else None,
+            latitude=lat,
+            longitude=lon,
+            address=random.choice(GUJARAT_ADDRESSES),
+            availability=avail,
+            tasks_completed=random.randint(0, 20),
+            rating=round(random.uniform(3.0, 5.0), 1),
+            total_ratings=random.randint(1, 12),
+            created_at=user.created_at,
+        )
+        db.add(vol)
+        volunteers.append(vol)
+        print(f"  Volunteer (GJ): {name} | Skills: {skills} | {avail}")
 
     # --- NEEDS ---
     needs_data = [
@@ -193,8 +273,45 @@ def seed():
 
         db.add(need)
         all_needs.append(need)
-        emoji = {"medical": "🏥", "food": "🍚", "shelter": "🏠", "water": "💧", "rescue": "🚨", "education": "📚", "clothing": "👕", "sanitation": "🧹"}.get(cat, "📋")
-        print(f"  {emoji} Need: {title} [{cat}] urgency={urgency} status={status_val}")
+        print(f"  Need: {title} [{cat}] urgency={urgency} status={status_val}")
+
+    # Gujarat needs
+    gujarat_needs_data = [
+        ("Medical camp at Vadodara slum", "Free health checkup needed for 100+ families in Tandalja area.", "medical", 3, 100, "Tandalja, Vadodara"),
+        ("Food distribution in Ahmedabad flood zone", "Sabarmati riverbank area flooded. 150 families need food packets.", "food", 5, 150, "Sabarmati, Ahmedabad"),
+        ("Clean water needed in Surat textile zone", "Workers in Pandesara area reporting contaminated water supply.", "water", 4, 200, "Pandesara, Surat"),
+        ("Shelter for displaced families in Rajkot", "20 families displaced due to heavy rains. Temporary shelters needed.", "shelter", 4, 80, "Aji Dam Area, Rajkot"),
+        ("School supplies for Gandhinagar children", "Government school needs notebooks and stationery for 60 students.", "education", 2, 60, "Sector 7, Gandhinagar"),
+        ("Sanitation drive in Bhavnagar market", "Market area drainage clogged. Risk of water-borne diseases.", "sanitation", 3, 120, "Market Area, Bhavnagar"),
+        ("Rescue operation after wall collapse", "Old city wall collapsed in Vadodara. 5 people trapped.", "rescue", 5, 5, "Walled City, Vadodara"),
+        ("Clothing drive for Surat migrant workers", "Textile mill workers need winter clothing and blankets.", "clothing", 3, 90, "Udhna, Surat"),
+    ]
+
+    for i, (title, desc, cat, urgency, affected, addr) in enumerate(gujarat_needs_data):
+        lat, lon = _gujarat_coords()
+        status_val = statuses[i % len(statuses)]
+
+        need = Need(
+            id=_uuid(),
+            reported_by=admin_user.id if i % 2 == 0 else volunteers[len(volunteer_names) + (i % len(gujarat_volunteer_names))].user_id,
+            title=title,
+            description=desc,
+            category=cat,
+            urgency=urgency,
+            status=status_val,
+            latitude=lat,
+            longitude=lon,
+            address=addr,
+            people_affected=affected,
+            source=random.choice(["manual", "manual", "ocr"]),
+            created_at=_random_past(10),
+        )
+        if status_val == "resolved":
+            need.resolved_at = need.created_at + timedelta(hours=random.randint(2, 48))
+
+        db.add(need)
+        all_needs.append(need)
+        print(f"  Need (GJ): {title} [{cat}] urgency={urgency} status={status_val}")
 
     # --- ASSIGNMENTS ---
     assigned_needs = [n for n in all_needs if n.status in ("assigned", "in_progress", "resolved")]
@@ -226,18 +343,18 @@ def seed():
 
             need.assigned_volunteer_id = vol.id
             db.add(assignment)
-            print(f"  🔗 Assignment: {need.title[:40]}... → Volunteer {vol.id[:8]}...")
+            print(f"  Assignment: {need.title[:40]}... -> Volunteer {vol.id[:8]}...")
 
     # --- COMMIT ---
     db.commit()
     db.close()
 
-    print(f"\n✅ Seed complete!")
-    print(f"   👤 1 Admin + {len(volunteers)} Volunteers")
-    print(f"   📋 {len(all_needs)} Needs")
-    print(f"   🔗 {len(assigned_needs)} Assignments")
-    print(f"\n💡 Start the server: uvicorn app.main:app --reload")
-    print(f"📖 API Docs: http://localhost:8000/docs")
+    print(f"\nSeed complete!")
+    print(f"   1 Admin + {len(volunteers)} Volunteers")
+    print(f"   {len(all_needs)} Needs")
+    print(f"   {len(assigned_needs)} Assignments")
+    print(f"\n   Start the server: uvicorn app.main:app --reload")
+    print(f"   API Docs: http://localhost:8000/docs")
 
 
 if __name__ == "__main__":

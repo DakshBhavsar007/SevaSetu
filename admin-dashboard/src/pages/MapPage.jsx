@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
 import { needs as needsApi, analytics } from '../services/api';
+import { Map as MapIcon, RefreshCw, Flame, Search, X } from 'lucide-react';
 
 export default function MapPage() {
   const mapRef = useRef(null);
@@ -53,7 +54,7 @@ export default function MapPage() {
     const map = L.map(mapRef.current, {
       zoomControl: true,
       attributionControl: true,
-    }).setView([19.076, 72.878], 12);
+    }).setView([22.0, 73.5], 6);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO',
@@ -88,10 +89,6 @@ export default function MapPage() {
       water: '#06B6D4', rescue: '#A855F7', education: '#10B981',
       clothing: '#EAB308', sanitation: '#14B8A6', other: '#6B7280',
     };
-    const catIcons = {
-      medical: '🏥', food: '🍚', shelter: '🏠', water: '💧',
-      rescue: '🚨', education: '📚', clothing: '👕', sanitation: '🧹', other: '📋',
-    };
 
     mapNeeds.forEach(need => {
       const color = catColors[need.category] || '#6B7280';
@@ -106,12 +103,19 @@ export default function MapPage() {
         fillOpacity: 0.6,
       });
 
+      // HTML template for urgency bar
+      let urgencyHtml = '<div style="display:flex;gap:2px;margin-top:2px;">';
+      for(let i=1; i<=5; i++) {
+        urgencyHtml += `<div style="width:6px;height:6px;border-radius:50%;background:${i <= need.urgency ? '#EF4444' : '#ccc'}"></div>`;
+      }
+      urgencyHtml += '</div>';
+
       marker.bindPopup(`
         <div style="font-family: Inter, sans-serif; min-width: 220px;">
-          <h4 style="margin: 0 0 4px; font-size: 14px;">${catIcons[need.category] || '📋'} ${need.title}</h4>
+          <h4 style="margin: 0 0 4px; font-size: 14px;">${need.title}</h4>
           <p style="margin: 0; color: #666; font-size: 12px;">
             Category: <strong>${need.category}</strong><br/>
-            Urgency: <strong>${'🔴'.repeat(need.urgency)}${'⚪'.repeat(5 - need.urgency)}</strong> (${need.urgency}/5)<br/>
+            Urgency: ${urgencyHtml} (${need.urgency}/5)<br/>
             People: <strong>${need.people_affected}</strong><br/>
             Status: <strong>${need.status}</strong>
           </p>
@@ -205,33 +209,36 @@ export default function MapPage() {
       radius: 12, fillColor: '#FBBF24', color: '#F59E0B',
       weight: 3, opacity: 1, fillOpacity: 0.4,
     }).addTo(map);
-    searchMarkerRef.current.bindPopup(`<b>📍 ${name}</b>`).openPopup();
+    searchMarkerRef.current.bindPopup(`<b>Location: ${name}</b>`).openPopup();
 
     setSearchQuery(name);
     setSearchResults([]);
   }
 
   const categories = ['medical', 'food', 'shelter', 'water', 'rescue', 'education', 'clothing', 'sanitation'];
-  const catIcons = { medical: '🏥', food: '🍚', shelter: '🏠', water: '💧', rescue: '🚨', education: '📚', clothing: '👕', sanitation: '🧹' };
 
   return (
     <>
       <div className="page-header">
         <div>
-          <h2>🗺️ Live Crisis Map</h2>
-          <div className="subtitle">
+          <h2 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapIcon size={24} color="var(--accent)" /> Live Crisis Map</h2>
+          <div className="subtitle" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {loading ? 'Loading...' : `${mapNeeds.length} active needs on map`}
-            <span style={{ marginLeft: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>🟢 Auto-refresh 30s</span>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent-green)' }}></span> Auto-refresh 30s
+            </span>
           </div>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             className={`btn btn-sm ${showHeatmap ? 'btn-primary' : 'btn-outline'}`}
-            onClick={() => setShowHeatmap(!showHeatmap)}
+            onClick={() => setShowHeatmap(!showHeatmap)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            🔥 {showHeatmap ? 'Hide' : 'Show'} Heatmap
+            <Flame size={14} color={showHeatmap ? '#fff' : 'var(--accent-orange)'} /> {showHeatmap ? 'Hide' : 'Show'} Heatmap
           </button>
-          <button className="btn btn-primary" onClick={loadMapData}>↻ Refresh</button>
+          <button className="btn btn-primary" onClick={loadMapData} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <RefreshCw size={14} /> Refresh
+          </button>
         </div>
       </div>
 
@@ -249,34 +256,38 @@ export default function MapPage() {
               key={cat}
               className={`btn btn-sm ${filter === cat ? 'btn-primary' : 'btn-outline'}`}
               onClick={() => setFilter(filter === cat ? '' : cat)}
+              style={{ textTransform: 'capitalize' }}
             >
-              {catIcons[cat]} {cat}
+              {cat}
             </button>
           ))}
         </div>
 
         {/* Search Bar */}
         <div style={{ position: 'relative', marginBottom: '16px' }}>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--bg-input)', border: '1px solid var(--border-color)', borderRadius: '10px', padding: '0 12px' }}>
+            <Search size={16} color="var(--text-muted)" />
             <input
               type="text"
-              placeholder="🔍 Search location (e.g. Dharavi, Mumbai, Kurla)"
+              placeholder="Search location (e.g. Dharavi, Mumbai, Kurla)"
               value={searchQuery}
               onChange={e => handleSearchInput(e.target.value)}
               style={{
-                flex: 1, padding: '10px 16px', borderRadius: '10px',
-                border: '1px solid var(--border-color)', background: 'var(--bg-input)',
+                flex: 1, padding: '10px 4px',
+                border: 'none', background: 'transparent',
                 color: 'var(--text-primary)', fontSize: '14px', outline: 'none',
               }}
             />
             {searchQuery && (
-              <button className="btn btn-outline btn-sm" onClick={() => {
+              <button className="btn btn-sm" onClick={() => {
                 setSearchQuery(''); setSearchResults([]);
                 if (searchMarkerRef.current && mapInstanceRef.current) {
                   mapInstanceRef.current.removeLayer(searchMarkerRef.current);
                   searchMarkerRef.current = null;
                 }
-              }}>✕</button>
+              }} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
+                <X size={16} />
+              </button>
             )}
           </div>
           {/* Search Results Dropdown */}
@@ -299,7 +310,7 @@ export default function MapPage() {
                   onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 >
-                  <div style={{ fontWeight: 600 }}>📍 {r.display_name.split(',').slice(0, 2).join(', ')}</div>
+                  <div style={{ fontWeight: 600 }}>Location: {r.display_name.split(',').slice(0, 2).join(', ')}</div>
                   <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
                     {r.display_name}
                   </div>
@@ -308,7 +319,7 @@ export default function MapPage() {
             </div>
           )}
           {searching && (
-            <div style={{ position: 'absolute', right: '60px', top: '10px', fontSize: '12px', color: 'var(--text-muted)' }}>Searching...</div>
+            <div style={{ position: 'absolute', right: '40px', top: '10px', fontSize: '12px', color: 'var(--text-muted)' }}>Searching...</div>
           )}
         </div>
 
@@ -335,7 +346,7 @@ export default function MapPage() {
             water: '#06B6D4', rescue: '#A855F7', education: '#10B981',
             clothing: '#EAB308', sanitation: '#14B8A6',
           }).map(([cat, color]) => (
-            <span key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', textTransform: 'capitalize' }}>
               <span style={{
                 width: 10, height: 10, borderRadius: '50%',
                 background: color, display: 'inline-block',
@@ -346,7 +357,7 @@ export default function MapPage() {
           <span style={{ marginLeft: '16px' }}>○ Large circle = High urgency</span>
           {showHeatmap && (
             <span style={{ marginLeft: '8px' }}>
-              🔥 Heatmap: <span style={{ color: '#2563EB' }}>Low</span> → <span style={{ color: '#F97316' }}>Med</span> → <span style={{ color: '#EF4444' }}>High</span> density
+              <Flame size={12} color="var(--accent-orange)" style={{ verticalAlign: 'text-bottom' }} /> Heatmap: <span style={{ color: '#2563EB' }}>Low</span> → <span style={{ color: '#F97316' }}>Med</span> → <span style={{ color: '#EF4444' }}>High</span> density
             </span>
           )}
         </div>

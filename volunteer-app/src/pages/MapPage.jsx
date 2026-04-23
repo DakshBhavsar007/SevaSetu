@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Map as MapIcon, MapPin, RefreshCw, Navigation } from 'lucide-react';
 
 const API_BASE = '/api/v1';
 
@@ -62,7 +63,7 @@ export default function MapPage() {
             radius: 10, fillColor: '#3B82F6', color: '#fff',
             weight: 3, opacity: 1, fillOpacity: 0.9,
           }).addTo(map);
-          myLocMarkerRef.current.bindPopup('<b>📍 You are here</b>').openPopup();
+          myLocMarkerRef.current.bindPopup('<b>You are here</b>').openPopup();
 
           // Also add outer pulse ring
           L.circleMarker([loc.lat, loc.lng], {
@@ -82,7 +83,7 @@ export default function MapPage() {
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    const map = L.map(mapRef.current).setView([19.076, 72.878], 12);
+    const map = L.map(mapRef.current).setView([22.0, 73.5], 6);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OSM &copy; CARTO', maxZoom: 19,
     }).addTo(map);
@@ -106,10 +107,6 @@ export default function MapPage() {
       water: '#06B6D4', rescue: '#A855F7', education: '#10B981',
       clothing: '#EAB308', sanitation: '#14B8A6', other: '#6B7280',
     };
-    const catIcons = {
-      medical: '🏥', food: '🍚', shelter: '🏠', water: '💧',
-      rescue: '🚨', education: '📚', clothing: '👕', sanitation: '🧹', other: '📋',
-    };
 
     needs.forEach(n => {
       const color = catColors[n.category] || '#6B7280';
@@ -120,11 +117,18 @@ export default function MapPage() {
         weight: 2, opacity: 0.9, fillOpacity: 0.5,
       });
 
+      // HTML template for urgency bar
+      let urgencyHtml = '<div style="display:flex;gap:2px;margin-top:2px;">';
+      for(let i=1; i<=5; i++) {
+        urgencyHtml += `<div style="width:6px;height:6px;border-radius:50%;background:${i <= n.urgency ? '#EF4444' : '#ccc'}"></div>`;
+      }
+      urgencyHtml += '</div>';
+
       marker.bindPopup(`
         <div style="font-family:Inter,sans-serif;min-width:180px">
-          <div style="font-weight:700;font-size:13px;margin-bottom:4px">${catIcons[n.category]} ${n.title}</div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px">${n.title}</div>
           <div style="font-size:11px;color:#888">
-            Urgency: ${'🔴'.repeat(n.urgency)}${'⚪'.repeat(5-n.urgency)}<br/>
+            Urgency: ${urgencyHtml}<br/>
             People: <b>${n.people_affected}</b><br/>
             Status: <b>${n.status}</b>
           </div>
@@ -146,17 +150,16 @@ export default function MapPage() {
   }, [needs]);
 
   const cats = ['medical', 'food', 'shelter', 'water', 'rescue', 'education', 'clothing', 'sanitation'];
-  const catIcons = { medical: '🏥', food: '🍚', shelter: '🏠', water: '💧', rescue: '🚨', education: '📚', clothing: '👕', sanitation: '🧹' };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', paddingBottom: '70px' }}>
       {/* Header */}
       <div style={{ padding: '16px 16px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2 style={{ margin: 0, fontSize: '18px' }}>🗺️ Nearby Needs</h2>
-          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+          <h2 style={{ margin: 0, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '6px' }}><MapIcon size={20} color="var(--accent)" /> Nearby Needs</h2>
+          <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             {loading ? 'Loading...' : `${needs.length} active needs`}
-            <span style={{ marginLeft: '8px' }}>🟢 Live</span>
+            <span style={{ marginLeft: '4px', display: 'inline-block', width: '6px', height: '6px', background: 'var(--accent-green)', borderRadius: '50%' }}></span> Live
           </div>
         </div>
         <button
@@ -165,10 +168,10 @@ export default function MapPage() {
           style={{
             padding: '8px 14px', borderRadius: '10px', border: 'none',
             background: 'linear-gradient(135deg, #3B82F6, #6366F1)', color: '#fff',
-            fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+            fontSize: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
           }}
         >
-          {locating ? '⏳ Locating...' : '📍 My Location'}
+          {locating ? <><RefreshCw size={14} className="spin" /> Locating...</> : <><Navigation size={14} /> My Location</>}
         </button>
       </div>
 
@@ -190,9 +193,9 @@ export default function MapPage() {
               padding: '5px 12px', borderRadius: '20px', border: '1px solid var(--border-color)',
               background: filter === c ? 'var(--accent)' : 'transparent',
               color: filter === c ? '#fff' : 'var(--text-secondary)',
-              fontSize: '11px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap',
+              fontSize: '11px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap', textTransform: 'capitalize'
             }}
-          >{catIcons[c]} {c}</button>
+          >{c}</button>
         ))}
       </div>
 
@@ -206,10 +209,10 @@ export default function MapPage() {
         display: 'flex', gap: '10px', padding: '8px 16px', flexWrap: 'wrap',
         fontSize: '10px', color: 'var(--text-muted)',
       }}>
-        <span>🔵 You</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><span style={{ width: 8, height: 8, borderRadius: '50%', background: '#3B82F6', display: 'inline-block' }}></span> You</span>
         {Object.entries({ medical: '#EF4444', food: '#F97316', shelter: '#3B82F6', water: '#06B6D4', rescue: '#A855F7' })
           .map(([c, col]) => (
-            <span key={c} style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+            <span key={c} style={{ display: 'flex', alignItems: 'center', gap: '3px', textTransform: 'capitalize' }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: col, display: 'inline-block' }}></span>
               {c}
             </span>

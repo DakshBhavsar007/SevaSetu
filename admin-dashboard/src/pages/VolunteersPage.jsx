@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { volunteers } from '../services/api';
+import { Users, CheckCircle2, Clock, XCircle, Car, Star } from 'lucide-react';
 
 export default function VolunteersPage() {
   const [data, setData] = useState([]);
@@ -24,16 +25,16 @@ export default function VolunteersPage() {
   return (
     <>
       <div className="page-header">
-        <div><h2>Volunteers</h2><div className="subtitle">{data.length} registered volunteers</div></div>
+        <div><h2><Users size={22} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'text-bottom' }} /> Volunteers</h2><div className="subtitle">{data.length} registered volunteers</div></div>
       </div>
 
       <div className="page-body">
         <div className="filter-bar">
           <select className="form-select" value={filter} onChange={e => setFilter(e.target.value)}>
             <option value="">All Status</option>
-            <option value="available">🟢 Available</option>
-            <option value="busy">🟡 Busy</option>
-            <option value="offline">⚫ Offline</option>
+            <option value="available">Available</option>
+            <option value="busy">Busy</option>
+            <option value="offline">Offline</option>
           </select>
         </div>
 
@@ -41,7 +42,7 @@ export default function VolunteersPage() {
           <div className="loading"><div className="spinner"></div> Loading...</div>
         ) : data.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">🙋</div>
+            <div className="empty-icon" style={{ display: 'flex', justifyContent: 'center', color: 'var(--text-muted)' }}><Users size={48} /></div>
             <p>No volunteers found.</p>
           </div>
         ) : (
@@ -70,7 +71,7 @@ export default function VolunteersPage() {
                         {(vol.skills || []).slice(0, 3).map(s => (
                           <span key={s} style={{
                             fontSize: '10px', padding: '2px 8px', borderRadius: '12px',
-                            background: 'rgba(59,130,246,0.15)', color: 'var(--accent-blue)',
+                            background: 'rgba(59,130,246,0.15)', color: 'var(--accent)',
                           }}>{s}</span>
                         ))}
                         {(vol.skills || []).length > 3 && (
@@ -78,12 +79,17 @@ export default function VolunteersPage() {
                         )}
                       </div>
                     </td>
-                    <td>{vol.has_vehicle ? `🚗 ${vol.vehicle_type || ''}` : '—'}</td>
-                    <td><span className={`badge badge-${vol.availability}`}>{vol.availability}</span></td>
+                    <td>{vol.has_vehicle ? <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Car size={14} /> {vol.vehicle_type || ''}</span> : '—'}</td>
+                    <td>
+                      <span className={`badge badge-${vol.availability}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        {vol.availability === 'available' ? <CheckCircle2 size={12} /> : vol.availability === 'busy' ? <Clock size={12} /> : <XCircle size={12} />}
+                        {vol.availability}
+                      </span>
+                    </td>
                     <td>{vol.tasks_completed}</td>
                     <td>
-                      <span style={{ color: vol.rating >= 4 ? 'var(--accent-green)' : 'var(--text-secondary)' }}>
-                        ⭐ {vol.rating?.toFixed(1) || '0.0'}
+                      <span style={{ color: vol.rating >= 4 ? 'var(--accent-green)' : 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Star size={14} fill={vol.rating >= 4 ? 'currentColor' : 'none'} /> {vol.rating?.toFixed(1) || '0.0'}
                       </span>
                     </td>
                     <td style={{ fontSize: '11px', color: 'var(--text-muted)' }}>

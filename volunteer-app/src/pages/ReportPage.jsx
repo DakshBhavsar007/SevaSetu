@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { needs } from '../services/api';
+import { CheckCircle2, AlertTriangle, MapPin, Send } from 'lucide-react';
 
 export default function ReportPage() {
   const [form, setForm] = useState({
@@ -35,7 +36,7 @@ export default function ReportPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!form.title) return alert('Title is required');
-    if (!form.latitude || !form.longitude) return alert('Please detect your location');
+    if ((!form.latitude || !form.longitude) && !form.address) return alert('Please detect your location or enter an address');
 
     setSubmitting(true);
     try {
@@ -53,7 +54,7 @@ export default function ReportPage() {
       <>
         <div className="vol-page-header"><h1>Report Need</h1></div>
         <div className="vol-page" style={{ textAlign: 'center', paddingTop: '40px' }}>
-          <div style={{ fontSize: '4rem', marginBottom: '16px' }}>✅</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px', color: 'var(--accent-green)' }}><CheckCircle2 size={64} /></div>
           <h2 style={{ marginBottom: '8px' }}>Need Reported!</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
             Thank you. Your report has been submitted and will be reviewed.
@@ -69,7 +70,7 @@ export default function ReportPage() {
   return (
     <>
       <div className="vol-page-header">
-        <h1>🆘 Report a Need</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={24} color="var(--accent-red)" /> Report a Need</h1>
         <div className="subtitle">Help us identify community needs</div>
       </div>
 
@@ -123,12 +124,12 @@ export default function ReportPage() {
           <div className="vol-form-group">
             <label className="vol-form-label">Location</label>
             <button type="button" className="vol-btn outline" onClick={detectLocation} disabled={locLoading}>
-              {locLoading ? '📍 Detecting...' : form.latitude ? `📍 ${form.latitude.toFixed(4)}, ${form.longitude.toFixed(4)}` : '📍 Detect My Location'}
+              {locLoading ? <><MapPin size={16} /> Detecting...</> : form.latitude ? <><MapPin size={16} /> {form.latitude.toFixed(4)}, {form.longitude.toFixed(4)}</> : <><MapPin size={16} /> Detect My Location</>}
             </button>
           </div>
 
           <button type="submit" className="vol-btn primary" disabled={submitting}>
-            {submitting ? 'Submitting...' : '🆘 Submit Report'}
+            {submitting ? 'Submitting...' : <><Send size={16} /> Submit Report</>}
           </button>
         </form>
       </div>
