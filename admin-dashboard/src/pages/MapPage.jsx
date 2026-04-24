@@ -63,18 +63,8 @@ export default function MapPage() {
 
   // Weather alert fetch
   const loadWeatherAlert = useCallback(async (center = mapCenter) => {
-    if (!OWM_API_KEY) {
-      setWeatherAlert({
-        temp: 32, feels_like: 37, humidity: 85,
-        wind_speed: 28, rain1h: 1.2,
-        description: 'moderate rain', icon: '10d',
-        alertLevel: 'yellow',
-        color: '#F59E0B',
-        label: 'YELLOW ALERT — Light Rain',
-        bg: 'rgba(245,158,11,0.10)',
-      });
-      return;
-    }
+    // Only fetch real weather data when API key is configured
+    if (!OWM_API_KEY) return;
     setWeatherLoading(true);
     const result = await fetchWeatherWithAlerts(center.lat, center.lng, OWM_API_KEY);
     if (result) setWeatherAlert(result);
@@ -277,6 +267,19 @@ export default function MapPage() {
       </div>
 
       <div className="page-body">
+        {/* Weather: No API Key notice */}
+        {showWeather && !OWM_API_KEY && (
+          <div style={{
+            marginBottom: '16px', padding: '12px 18px',
+            background: 'rgba(100,116,139,0.1)',
+            border: '1px solid rgba(100,116,139,0.3)',
+            borderRadius: '12px', fontSize: '13px', color: 'var(--text-secondary)',
+          }}>
+            <CloudRain size={16} style={{ verticalAlign: 'text-bottom', marginRight: '6px' }} />
+            Weather overlay needs an API key. Add <code style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 6px', borderRadius: '4px' }}>VITE_OWM_API_KEY=your-key</code> to <code style={{ background: 'rgba(255,255,255,0.1)', padding: '1px 6px', borderRadius: '4px' }}>.env</code> (free at openweathermap.org)
+          </div>
+        )}
+
         {/* Weather Alert Banner */}
         {showWeather && weatherAlert && (
           <div style={{

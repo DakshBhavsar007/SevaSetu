@@ -116,12 +116,9 @@ export default function DisasterAlertSystem() {
   const pollRef = useRef(null);
 
   const load = useCallback(async () => {
-    let result;
-    if (!OWM_KEY) {
-      result = getDemoWeatherAlert();
-    } else {
-      result = await fetchWeatherWithAlerts(INDIA_CENTER.lat, INDIA_CENTER.lng, OWM_KEY);
-    }
+    // Only fetch real weather data when API key is configured
+    if (!OWM_KEY) return;
+    const result = await fetchWeatherWithAlerts(INDIA_CENTER.lat, INDIA_CENTER.lng, OWM_KEY);
     if (result) {
       setWeather(result);
       setLastFetch(new Date());

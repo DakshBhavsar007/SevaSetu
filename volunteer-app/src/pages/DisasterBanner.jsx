@@ -70,18 +70,8 @@ export default function DisasterBanner() {
 
   const load = useCallback(async () => {
     setDismissed(false);
-    if (!OWM_KEY) {
-      // Demo mode — show a yellow alert
-      setDisasters([{
-        id: 'HEAVY_RAIN', name: 'Heavy Rain', icon: '🌧️', color: '#06B6D4',
-        severity: 3, level: 'medium',
-        desc: '3.5mm/h rainfall', action: 'Monitor waterways. Avoid flooded roads.',
-        wind_kmh: 35, rain1h: 3.5, temp: 30, humidity: 85,
-        timestamp: new Date().toISOString(),
-      }]);
-      setLastCheck(new Date());
-      return;
-    }
+    // Only fetch real weather data when API key is configured
+    if (!OWM_KEY) return;
     try {
       const res = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?lat=${INDIA_CENTER.lat}&lon=${INDIA_CENTER.lng}&appid=${OWM_KEY}&units=metric`
