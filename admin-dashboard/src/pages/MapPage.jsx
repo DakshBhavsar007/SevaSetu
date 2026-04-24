@@ -1,15 +1,27 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.heat';
 import { needs as needsApi, analytics } from '../services/api';
-import { Map as MapIcon, RefreshCw, Flame, Search, X } from 'lucide-react';
+import { Map as MapIcon, RefreshCw, Flame, Search, X, CloudRain } from 'lucide-react';
+import {
+  getOWMTileUrl, fetchWeatherWithAlerts,
+  WEATHER_LAYERS, INDIA_CENTER,
+} from '../services/weatherService';
+
+const OWM_API_KEY = import.meta.env.VITE_OWM_API_KEY || '';
 
 export default function MapPage() {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersLayerRef = useRef(null);
   const heatLayerRef = useRef(null);
+  const weatherLayerRef = useRef(null);
+  const searchMarkerRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
+  const pollRef = useRef(null);
+  const weatherPollRef = useRef(null);
+
   const [mapNeeds, setMapNeeds] = useState([]);
   const [filter, setFilter] = useState('');
   const [loading, setLoading] = useState(true);
@@ -18,13 +30,16 @@ export default function MapPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
-  const searchMarkerRef = useRef(null);
-  const searchTimeoutRef = useRef(null);
-  const pollRef = useRef(null);
+
+  // Weather state
+  const [showWeather, setShowWeather] = useState(false);
+  const [activeWeatherLayer, setActiveWeatherLayer] = useState('precipitation_new');
+  const [weatherAlert, setWeatherAlert] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [mapCenter, setMapCenter] = useState({ lat: INDIA_CENTER.lat, lng: INDIA_CENTER.lng });
 
   useEffect(() => { loadMapData(); }, [filter]);
 
-  // Auto-refresh map every 30s
   useEffect(() => {
     pollRef.current = setInterval(() => { loadMapData(); }, 30000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
@@ -46,10 +61,40 @@ export default function MapPage() {
     setLoading(false);
   }
 
-  // Initialize map once
+  // Weather alert fetch
+  const loadWeatherAlert = useCallback(async (center = mapCenter) => {
+    if (!OWM_API_KEY) {
+      setWeatherAlert({
+        temp: 32, feels_like: 37, humidity: 85,
+        wind_speed: 28, rain1h: 1.2,
+        description: 'moderate rain', icon: '10d',
+        alertLevel: 'yellow',
+        color: '#F59E0B',
+        label: 'YELLOW ALERT — Light Rain',
+        bg: 'rgba(245,158,11,0.10)',
+      });
+      return;
+    }
+    setWeatherLoading(true);
+    const result = await fetchWeatherWithAlerts(center.lat, center.lng, OWM_API_KEY);
+    if (result) setWeatherAlert(result);
+    setWeatherLoading(false);
+  }, [mapCenter]);
+
+  // Poll weather every 5 minutes when overlay is on
   useEffect(() => {
-    if (!mapRef.current) return;
-    if (mapInstanceRef.current) return;
+    if (!showWeather) {
+      if (weatherPollRef.current) clearInterval(weatherPollRef.current);
+      return;
+    }
+    loadWeatherAlert();
+    weatherPollRef.current = setInterval(() => loadWeatherAlert(), 5 * 60 * 1000);
+    return () => { if (weatherPollRef.current) clearInterval(weatherPollRef.current); };
+  }, [showWeather, loadWeatherAlert]);
+
+  // Initialize map
+  useEffect(() => {
+    if (!mapRef.current || mapInstanceRef.current) return;
 
     const map = L.map(mapRef.current, {
       zoomControl: true,
@@ -63,8 +108,13 @@ export default function MapPage() {
 
     markersLayerRef.current = L.layerGroup().addTo(map);
     mapInstanceRef.current = map;
+    setTimeout(() => map.invalidateSize(), 200);
 
-    setTimeout(() => { map.invalidateSize(); }, 200);
+    // Track center for weather fetch
+    map.on('moveend', () => {
+      const c = map.getCenter();
+      setMapCenter({ lat: c.lat, lng: c.lng });
+    });
 
     return () => {
       if (mapInstanceRef.current) {
@@ -72,16 +122,44 @@ export default function MapPage() {
         mapInstanceRef.current = null;
         markersLayerRef.current = null;
         heatLayerRef.current = null;
+        weatherLayerRef.current = null;
       }
     };
   }, []);
 
-  // Update markers when data changes
+  // Weather tile layer
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    if (weatherLayerRef.current) { map.removeLayer(weatherLayerRef.current); weatherLayerRef.current = null; }
+    if (!showWeather || !OWM_API_KEY) return;
+    const tileUrl = getOWMTileUrl(activeWeatherLayer, OWM_API_KEY);
+    if (tileUrl) {
+      weatherLayerRef.current = L.tileLayer(tileUrl, {
+        opacity: 0.65, zIndex: 5,
+        attribution: 'Weather &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>',
+      }).addTo(map);
+    }
+  }, [showWeather, activeWeatherLayer]);
+
+  // Heatmap layer
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+    if (heatLayerRef.current) { map.removeLayer(heatLayerRef.current); heatLayerRef.current = null; }
+    if (showHeatmap && heatmapData.length > 0) {
+      heatLayerRef.current = L.heatLayer(
+        heatmapData.map(p => [p.latitude, p.longitude, p.intensity || 50]),
+        { radius: 35, blur: 25, maxZoom: 17, max: 100, gradient: { 0.2: '#2563EB', 0.4: '#06B6D4', 0.6: '#10B981', 0.8: '#F97316', 1.0: '#EF4444' } }
+      ).addTo(map);
+    }
+  }, [showHeatmap, heatmapData]);
+
+  // Need markers
   useEffect(() => {
     const map = mapInstanceRef.current;
     const markersLayer = markersLayerRef.current;
     if (!map || !markersLayer) return;
-
     markersLayer.clearLayers();
 
     const catColors = {
@@ -95,15 +173,10 @@ export default function MapPage() {
       const radius = 6 + (need.urgency * 2);
 
       const marker = L.circleMarker([need.latitude, need.longitude], {
-        radius,
-        fillColor: color,
-        color: color,
-        weight: 2,
-        opacity: 0.9,
-        fillOpacity: 0.6,
+        radius, fillColor: color, color: color,
+        weight: 2, opacity: 0.9, fillOpacity: 0.6,
       });
 
-      // HTML template for urgency bar
       let urgencyHtml = '<div style="display:flex;gap:2px;margin-top:2px;">';
       for(let i=1; i<=5; i++) {
         urgencyHtml += `<div style="width:6px;height:6px;border-radius:50%;background:${i <= need.urgency ? '#EF4444' : '#ccc'}"></div>`;
@@ -123,60 +196,24 @@ export default function MapPage() {
       `);
 
       markersLayer.addLayer(marker);
-
       if (need.urgency >= 4) {
-        const pulse = L.circleMarker([need.latitude, need.longitude], {
+        markersLayer.addLayer(L.circleMarker([need.latitude, need.longitude], {
           radius: radius + 8, fillColor: color, color: color,
           weight: 1, opacity: 0.3, fillOpacity: 0.1,
-        });
-        markersLayer.addLayer(pulse);
+        }));
       }
     });
 
     if (mapNeeds.length > 0) {
-      const bounds = L.latLngBounds(mapNeeds.map(n => [n.latitude, n.longitude]));
-      map.fitBounds(bounds, { padding: [50, 50] });
+      map.fitBounds(L.latLngBounds(mapNeeds.map(n => [n.latitude, n.longitude])), { padding: [50, 50] });
     }
   }, [mapNeeds]);
 
-  // Toggle heatmap layer
-  useEffect(() => {
-    const map = mapInstanceRef.current;
-    if (!map) return;
-
-    // Remove existing heatmap
-    if (heatLayerRef.current) {
-      map.removeLayer(heatLayerRef.current);
-      heatLayerRef.current = null;
-    }
-
-    if (showHeatmap && heatmapData.length > 0) {
-      const heatPoints = heatmapData.map(p => [
-        p.latitude, p.longitude, p.intensity || 50
-      ]);
-
-      heatLayerRef.current = L.heatLayer(heatPoints, {
-        radius: 35,
-        blur: 25,
-        maxZoom: 17,
-        max: 100,
-        gradient: {
-          0.2: '#2563EB',
-          0.4: '#06B6D4',
-          0.6: '#10B981',
-          0.8: '#F97316',
-          1.0: '#EF4444',
-        },
-      }).addTo(map);
-    }
-  }, [showHeatmap, heatmapData]);
-
-  // Location search using Nominatim
+  // Search
   function handleSearchInput(value) {
     setSearchQuery(value);
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-    if (value.length < 3) { setSearchResults([]); return; }
-
+    if (!value || value.length < 3) { setSearchResults([]); return; }
     searchTimeoutRef.current = setTimeout(async () => {
       setSearching(true);
       try {
@@ -184,11 +221,8 @@ export default function MapPage() {
           `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&format=json&limit=5&countrycodes=in`,
           { headers: { 'User-Agent': 'SmartAlloc/1.0' } }
         );
-        const data = await res.json();
-        setSearchResults(data);
-      } catch (e) {
-        console.error('Search failed:', e);
-      }
+        setSearchResults(await res.json());
+      } catch (e) { console.error('Search failed:', e); }
       setSearching(false);
     }, 400);
   }
@@ -196,23 +230,16 @@ export default function MapPage() {
   function flyToLocation(lat, lon, name) {
     const map = mapInstanceRef.current;
     if (!map) return;
-
-    // Remove old search marker
-    if (searchMarkerRef.current) {
-      map.removeLayer(searchMarkerRef.current);
-    }
-
+    if (searchMarkerRef.current) map.removeLayer(searchMarkerRef.current);
     map.flyTo([lat, lon], 14, { duration: 1.5 });
-
-    // Add a pulsing search marker
     searchMarkerRef.current = L.circleMarker([lat, lon], {
       radius: 12, fillColor: '#FBBF24', color: '#F59E0B',
       weight: 3, opacity: 1, fillOpacity: 0.4,
     }).addTo(map);
     searchMarkerRef.current.bindPopup(`<b>Location: ${name}</b>`).openPopup();
-
     setSearchQuery(name);
     setSearchResults([]);
+    if (showWeather) loadWeatherAlert({ lat, lng: lon });
   }
 
   const categories = ['medical', 'food', 'shelter', 'water', 'rescue', 'education', 'clothing', 'sanitation'];
@@ -229,7 +256,14 @@ export default function MapPage() {
             </span>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button
+            className={`btn btn-sm ${showWeather ? '' : 'btn-outline'}`}
+            onClick={() => setShowWeather(!showWeather)}
+            style={showWeather ? { background: 'linear-gradient(135deg, #3b82f6, #0ea5e9)', color: 'white', border: 'none', display: 'flex', alignItems: 'center', gap: '6px' } : { display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <CloudRain size={14} /> {showWeather ? 'Hide Weather' : 'Weather Overlay'}
+          </button>
           <button
             className={`btn btn-sm ${showHeatmap ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setShowHeatmap(!showHeatmap)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
@@ -243,14 +277,54 @@ export default function MapPage() {
       </div>
 
       <div className="page-body">
+        {/* Weather Alert Banner */}
+        {showWeather && weatherAlert && (
+          <div style={{
+            marginBottom: '16px', padding: '12px 18px',
+            background: weatherAlert.bg || 'rgba(16,185,129,0.08)',
+            border: `1px solid ${weatherAlert.color || '#10B981'}40`,
+            borderRadius: '12px',
+            display: 'flex', alignItems: 'center', gap: '12px',
+          }}>
+            <img
+              src={`https://openweathermap.org/img/wn/${weatherAlert.icon || '01d'}@2x.png`}
+              alt={weatherAlert.description} style={{ width: 44, height: 44 }}
+            />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, fontSize: '13px', color: weatherAlert.color }}>
+                {weatherAlert.label || 'All Clear'}
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px', textTransform: 'capitalize' }}>
+                {weatherAlert.description} &middot; {weatherAlert.temp}&deg;C &middot; Wind: {weatherAlert.wind_speed} km/h &middot; Humidity: {weatherAlert.humidity}%
+                {weatherAlert.rain1h > 0 ? ` · Rain: ${weatherAlert.rain1h}mm/h` : ''}
+                {weatherAlert.cityName ? ` · ${weatherAlert.cityName}` : ''}
+              </div>
+            </div>
+            {weatherLoading && <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Updating...</span>}
+            {!OWM_API_KEY && <span style={{ fontSize: '10px', color: 'var(--text-muted)', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '8px' }}>Demo Mode</span>}
+          </div>
+        )}
+
+        {/* Weather Layer Selector */}
+        {showWeather && OWM_API_KEY && (
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', flexWrap: 'wrap' }}>
+            {WEATHER_LAYERS.map(layer => (
+              <button
+                key={layer.id}
+                className={`btn btn-sm ${activeWeatherLayer === layer.id ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => setActiveWeatherLayer(layer.id)}
+                title={layer.desc}
+                style={{ fontSize: '11px' }}
+              >
+                {layer.name}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Filter buttons */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-          <button
-            className={`btn btn-sm ${!filter ? 'btn-primary' : 'btn-outline'}`}
-            onClick={() => setFilter('')}
-          >
-            All
-          </button>
+          <button className={`btn btn-sm ${!filter ? 'btn-primary' : 'btn-outline'}`} onClick={() => setFilter('')}>All</button>
           {categories.map(cat => (
             <button
               key={cat}
@@ -269,7 +343,7 @@ export default function MapPage() {
             <Search size={16} color="var(--text-muted)" />
             <input
               type="text"
-              placeholder="Search location (e.g. Dharavi, Mumbai, Kurla)"
+              placeholder="Search location (e.g. Dharavi, Mumbai, Vadodara)"
               value={searchQuery}
               onChange={e => handleSearchInput(e.target.value)}
               style={{
@@ -290,7 +364,6 @@ export default function MapPage() {
               </button>
             )}
           </div>
-          {/* Search Results Dropdown */}
           {searchResults.length > 0 && (
             <div style={{
               position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 1000,
@@ -324,42 +397,24 @@ export default function MapPage() {
         </div>
 
         {/* Map */}
-        <div
-          className="map-container"
-          style={{
-            height: '600px',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            border: '1px solid var(--border-color)',
-          }}
-        >
+        <div className="map-container" style={{ height: '600px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
           <div ref={mapRef} style={{ height: '100%', width: '100%' }}></div>
         </div>
 
         {/* Legend */}
-        <div style={{
-          display: 'flex', gap: '16px', marginTop: '12px',
-          flexWrap: 'wrap', fontSize: '12px', color: 'var(--text-secondary)',
-        }}>
+        <div style={{ display: 'flex', gap: '16px', marginTop: '12px', flexWrap: 'wrap', fontSize: '12px', color: 'var(--text-secondary)' }}>
           {Object.entries({
             medical: '#EF4444', food: '#F97316', shelter: '#3B82F6',
             water: '#06B6D4', rescue: '#A855F7', education: '#10B981',
             clothing: '#EAB308', sanitation: '#14B8A6',
           }).map(([cat, color]) => (
             <span key={cat} style={{ display: 'flex', alignItems: 'center', gap: '4px', textTransform: 'capitalize' }}>
-              <span style={{
-                width: 10, height: 10, borderRadius: '50%',
-                background: color, display: 'inline-block',
-              }}></span>
+              <span style={{ width: 10, height: 10, borderRadius: '50%', background: color, display: 'inline-block' }}></span>
               {cat}
             </span>
           ))}
-          <span style={{ marginLeft: '16px' }}>○ Large circle = High urgency</span>
-          {showHeatmap && (
-            <span style={{ marginLeft: '8px' }}>
-              <Flame size={12} color="var(--accent-orange)" style={{ verticalAlign: 'text-bottom' }} /> Heatmap: <span style={{ color: '#2563EB' }}>Low</span> → <span style={{ color: '#F97316' }}>Med</span> → <span style={{ color: '#EF4444' }}>High</span> density
-            </span>
-          )}
+          <span style={{ marginLeft: '16px' }}>Large circle = High urgency</span>
+          {showWeather && <span style={{ marginLeft: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}><CloudRain size={12} color="var(--accent)" /> Weather overlay active</span>}
         </div>
       </div>
     </>

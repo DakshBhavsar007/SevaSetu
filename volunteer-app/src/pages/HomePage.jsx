@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../App';
 import { volunteer } from '../services/api';
 import { Hand, Star, ClipboardList, CheckCircle2, Zap, AlertTriangle, Settings, Stethoscope, Utensils, Home, Droplets, Siren, BookOpen, Shirt, Trash2 } from 'lucide-react';
+import DisasterBanner from './DisasterBanner';
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -39,6 +40,9 @@ export default function HomePage() {
       </div>
 
       <div className="vol-page">
+        {/* Disaster/Weather Alert */}
+        <DisasterBanner />
+
         {/* Stats */}
         {profile && (
           <div className="vol-stat-row">

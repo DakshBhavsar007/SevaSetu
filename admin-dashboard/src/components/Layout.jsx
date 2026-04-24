@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, ClipboardList, Map, Users, BrainCircuit, ScanLine, Radio, Rocket, Sun, Moon, LogOut } from 'lucide-react';
+import DisasterAlertSystem from './DisasterAlertSystem';
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -92,6 +93,7 @@ export default function Layout() {
       <main className="main-content">
         <Outlet />
       </main>
+      <DisasterAlertSystem />
     </div>
   );
 }
