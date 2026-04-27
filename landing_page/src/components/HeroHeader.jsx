@@ -25,7 +25,7 @@ const HeroHeader = () => {
   });
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/analytics/public-stats')
+    fetch('https://sevasetu-bnup.onrender.com/api/v1/analytics/public-stats')
       .then(res => res.json())
       .then(data => {
         setStats({

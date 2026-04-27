@@ -83,7 +83,7 @@ const DetailedShowcase = ({ onNavigate }) => {
   });
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/analytics/public-showcase')
+    fetch('https://sevasetu-bnup.onrender.com/api/v1/analytics/public-showcase')
       .then(res => res.json())
       .then(data => setDynamicData(data))
       .catch(err => console.error("Error fetching showcase data:", err));

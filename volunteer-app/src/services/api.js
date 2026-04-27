@@ -2,7 +2,7 @@
  * Volunteer App API service — communicates with the same backend as admin.
  */
 
-const API_BASE = '/api/v1';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://sevasetu-bnup.onrender.com/api/v1';
 
 function getToken() { return localStorage.getItem('vol_token'); }
 export function setToken(t) { localStorage.setItem('vol_token', t); }
