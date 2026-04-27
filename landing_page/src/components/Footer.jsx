@@ -58,7 +58,7 @@ const Footer = ({ onNavigate }) => {
       >
         <motion.div className="footer-brand" variants={itemVariants}>
           <div className="footer-logo-wrapper" style={{ color: '#fff', marginBottom: '16px' }}>
-            <Logo height="200px" scrolled={true} />
+            <Logo height="220px" scrolled={true} />
           </div>
           <p style={{ color: '#666', fontSize: '14px', maxWidth: '240px', lineHeight: '1.6' }}>
             Smart Resource Allocation Platform. Connecting volunteers with communities for maximum social impact.

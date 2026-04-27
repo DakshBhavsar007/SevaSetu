@@ -26,9 +26,10 @@ export const Logo = ({ height = '120px', scrolled = false }) => (
         objectFit: 'contain',
         imageRendering: '-webkit-optimize-contrast',
         display: 'block',
-        // Remove white background via mix-blend-mode over dark backgrounds
-        mixBlendMode: scrolled ? 'normal' : 'multiply',
-        filter: scrolled ? 'none' : 'contrast(1.1) brightness(1.05)',
+        // Transparent logo styles
+        mixBlendMode: 'normal',
+        filter: 'none',
+        transform: 'scale(1.4)',
       }}
     />
   </div>
@@ -77,7 +78,7 @@ const Navbar = ({ onNavigate }) => {
         whileHover={{ opacity: 0.88, scale: 1.02 }}
         transition={{ duration: 0.2 }}
       >
-        <Logo height={scrolled ? '80px' : '100px'} scrolled={scrolled} />
+        <Logo height={scrolled ? '80px' : '120px'} scrolled={scrolled} />
       </motion.button>
 
       <div className="nav-center">

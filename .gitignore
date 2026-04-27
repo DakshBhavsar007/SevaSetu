@@ -7,7 +7,9 @@ __pycache__/
 # Virtual environments
 venv/
 env/
+.venv/
 .env
+.env.*
 
 # Database
 *.db
@@ -16,8 +18,21 @@ env/
 *.db-journal
 *.sqlite3
 
-# Uploads
-uploads/
+# Node
+node_modules/
+dist/
+build/
+.cache/
+.next/
+out/
+.npm
+.yarn-error.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
@@ -25,18 +40,8 @@ uploads/
 *.swp
 *.swo
 
-# Node
-node_modules/
-dist/
-.cache/
-
-# OS
-.DS_Store
-Thumbs.db
-
 # Firebase credentials (NEVER commit this)
 firebase-credentials.json
 
-# User exclusions
-requirements.txt
-*.md
+# Local config
+*.local

@@ -60,11 +60,12 @@ export default function LoginPage() {
         src="/LOGO.png"
         alt="SevaSetu"
         style={{
-          height: '350px',
+          height: '280px',
           width: 'auto',
           objectFit: 'contain',
           marginBottom: '20px',
           imageRendering: '-webkit-optimize-contrast',
+          transform: 'scale(1.2)',
         }}
       />
       <p style={{ color: 'var(--text-secondary)', marginBottom: '28px', maxWidth: '280px', fontSize: '13px' }}>

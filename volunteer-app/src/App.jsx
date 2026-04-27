@@ -101,10 +101,11 @@ function TopBar() {
         src="/LOGO.png"
         alt="SevaSetu"
         style={{
-          height: '120px',
+          height: '100px',
           width: 'auto',
           objectFit: 'contain',
           imageRendering: '-webkit-optimize-contrast',
+          transform: 'scale(1.3)',
         }}
       />
     </header>

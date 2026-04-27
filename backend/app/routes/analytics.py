@@ -382,3 +382,81 @@ async def get_public_stats(db: Session = Depends(get_db)):
         "task_completion": task_completion,
         "user_rating": round(avg_rating, 1)
     }
+
+@router.get("/public-showcase")
+async def get_public_showcase(db: Session = Depends(get_db)):
+    """Public data for the landing page showcase."""
+    from ..models import User
+    # Top 4 volunteers
+    top_vols = db.query(Volunteer, User).join(User, Volunteer.user_id == User.id)\
+        .order_by(Volunteer.rating.desc())\
+        .limit(4).all()
+    
+    volunteers_data = []
+    for vol, user in top_vols:
+        skills = ["Support"]
+        if vol.skills:
+            try:
+                import json
+                skills_list = json.loads(vol.skills)
+                if isinstance(skills_list, list):
+                    skills = skills_list[:3]
+            except:
+                pass
+                
+        # Generate initials
+        name_parts = user.name.split() if user.name else ["V"]
+        initials = "".join([p[0].upper() for p in name_parts[:2]]) if name_parts else "V"
+        
+        # Color based on index or rating
+        colors = ["#059669", "#3b82f6", "#8b5cf6", "#eab308"]
+        color = colors[len(volunteers_data) % len(colors)]
+        
+        volunteers_data.append({
+            "name": user.name or "Volunteer",
+            "role": f"Level {vol.experience_level} Volunteer" if hasattr(vol, 'experience_level') else "Active Volunteer",
+            "score": str(int((vol.rating / 5.0) * 100)) if vol.rating else "90",
+            "color": color,
+            "skills": skills,
+            "initials": initials
+        })
+        
+    # Default volunteers if db empty
+    if not volunteers_data:
+        volunteers_data = [
+            {"name": "Priya Sharma", "role": "Medical Volunteer", "score": "98", "color": "#059669", "skills": ["First Aid", "CPR", "Nursing"], "initials": "PS"},
+            {"name": "Rahul Verma", "role": "Logistics Coordinator", "score": "95", "color": "#3b82f6", "skills": ["Transport", "Planning", "Supply"], "initials": "RV"},
+            {"name": "Anita Desai", "role": "Community Organizer", "score": "92", "color": "#8b5cf6", "skills": ["Teaching", "Outreach", "Hindi"], "initials": "AD"},
+            {"name": "Vikram Singh", "role": "Field Engineer", "score": "89", "color": "#059669", "skills": ["Civil", "Water", "Solar"], "initials": "VS"},
+        ]
+        
+    # Top 3 campaigns (needs)
+    recent_needs = db.query(Need)\
+        .filter(Need.status == "open")\
+        .order_by(Need.urgency.desc())\
+        .limit(3).all()
+        
+    campaigns_data = []
+    for n in recent_needs:
+        color = "#ef4444" if n.urgency >= 4 else ("#f59e0b" if n.urgency == 3 else "#059669")
+        urgency_text = "High" if n.urgency >= 4 else ("Medium" if n.urgency == 3 else "Low")
+        volunteers_req = f"0/{n.people_affected}" if n.people_affected else "Needed"
+        
+        campaigns_data.append({
+            "title": n.title[:30] + "..." if len(n.title) > 30 else n.title,
+            "urgency": urgency_text,
+            "color": color,
+            "volunteers": volunteers_req
+        })
+        
+    if not campaigns_data:
+        campaigns_data = [
+            { "title": "Flood Relief - Mumbai", "urgency": "High", "color": "#ef4444", "volunteers": "24/50" },
+            { "title": "Food Distribution - Delhi", "urgency": "Medium", "color": "#f59e0b", "volunteers": "18/30" },
+            { "title": "Education Drive - Pune", "urgency": "Low", "color": "#059669", "volunteers": "12/20" },
+        ]
+        
+    return {
+        "volunteers": volunteers_data,
+        "campaigns": campaigns_data
+    }

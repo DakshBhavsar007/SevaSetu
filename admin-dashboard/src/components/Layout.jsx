@@ -38,6 +38,7 @@ export default function Layout() {
               imageRendering: '-webkit-optimize-contrast',
               display: 'block',
               margin: '0 auto',
+              transform: 'scale(1.3)',
             }}
           />
         </div>

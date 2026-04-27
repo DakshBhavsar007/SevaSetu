@@ -1,42 +1,14 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronRight, PlayCircle, Code, Users, Target } from 'lucide-react';
 import './DetailedShowcase.css';
 
-const SimulatedDashboard = () => {
-  const volunteers = [
-    {
-      name: "Priya Sharma",
-      role: "Medical Volunteer",
-      score: "98",
-      color: "#059669",
-      skills: ["First Aid", "CPR", "Nursing"],
-      initials: "PS"
-    },
-    {
-      name: "Rahul Verma",
-      role: "Logistics Coordinator",
-      score: "95",
-      color: "#3b82f6",
-      skills: ["Transport", "Planning", "Supply"],
-      initials: "RV"
-    },
-    {
-      name: "Anita Desai",
-      role: "Community Organizer",
-      score: "92",
-      color: "#8b5cf6",
-      skills: ["Teaching", "Outreach", "Hindi"],
-      initials: "AD"
-    },
-    {
-      name: "Vikram Singh",
-      role: "Field Engineer",
-      score: "89",
-      color: "#059669",
-      skills: ["Civil", "Water", "Solar"],
-      initials: "VS"
-    },
+const SimulatedDashboard = ({ volunteers }) => {
+  const displayVolunteers = volunteers && volunteers.length > 0 ? volunteers : [
+    { name: "Priya Sharma", role: "Medical Volunteer", score: "98", color: "#059669", skills: ["First Aid", "CPR", "Nursing"], initials: "PS" },
+    { name: "Rahul Verma", role: "Logistics Coordinator", score: "95", color: "#3b82f6", skills: ["Transport", "Planning", "Supply"], initials: "RV" },
+    { name: "Anita Desai", role: "Community Organizer", score: "92", color: "#8b5cf6", skills: ["Teaching", "Outreach", "Hindi"], initials: "AD" },
+    { name: "Vikram Singh", role: "Field Engineer", score: "89", color: "#059669", skills: ["Civil", "Water", "Solar"], initials: "VS" },
   ];
 
   return (
@@ -50,7 +22,7 @@ const SimulatedDashboard = () => {
         <div className="dash-search" />
       </div>
       <div className="candidate-list">
-        {volunteers.map((c, i) => (
+        {displayVolunteers.map((c, i) => (
           <motion.div
             key={i}
             className="candidate-item"
@@ -105,6 +77,24 @@ const DetailedShowcase = ({ onNavigate }) => {
   const opacity1 = useTransform(scrollYProgress, [0, 0.5, 0.6], [1, 1, 0]);
   const opacity2 = useTransform(scrollYProgress, [0.35, 0.45, 1], [0, 1, 1]);
 
+  const [dynamicData, setDynamicData] = useState({
+    volunteers: [],
+    campaigns: []
+  });
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/v1/analytics/public-showcase')
+      .then(res => res.json())
+      .then(data => setDynamicData(data))
+      .catch(err => console.error("Error fetching showcase data:", err));
+  }, []);
+
+  const campaigns = dynamicData.campaigns.length > 0 ? dynamicData.campaigns : [
+    { title: "Flood Relief - Mumbai", urgency: "High", color: "#ef4444", volunteers: "24/50" },
+    { title: "Food Distribution - Delhi", urgency: "Medium", color: "#f59e0b", volunteers: "18/30" },
+    { title: "Education Drive - Pune", urgency: "Low", color: "#059669", volunteers: "12/20" },
+  ];
+
   return (
     <div className="showcase-horizontal-wrapper" ref={containerRef}>
       <div className="sticky-container">
@@ -150,11 +140,7 @@ const DetailedShowcase = ({ onNavigate }) => {
                       <p style={{margin:0, fontSize:'13px', color:'#6b6375'}}>3 campaigns need your help</p>
                     </div>
                     <div className="app-cards">
-                      {[
-                        { title: "Flood Relief - Mumbai", urgency: "High", color: "#ef4444", volunteers: "24/50" },
-                        { title: "Food Distribution - Delhi", urgency: "Medium", color: "#f59e0b", volunteers: "18/30" },
-                        { title: "Education Drive - Pune", urgency: "Low", color: "#059669", volunteers: "12/20" },
-                      ].map((c, i) => (
+                      {campaigns.map((c, i) => (
                         <div key={i} className="app-campaign-card">
                           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                             <strong style={{fontSize:'13px', color:'#1a1c1e'}}>{c.title}</strong>
@@ -195,7 +181,7 @@ const DetailedShowcase = ({ onNavigate }) => {
                   whileHover={{ scale: 1.02, rotate: -1 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <SimulatedDashboard />
+                  <SimulatedDashboard volunteers={dynamicData.volunteers} />
                 </motion.div>
               </div>
             </motion.div>
