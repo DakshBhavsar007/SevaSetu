@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Outlet } from 'react-router-dom';
 import { createContext, useContext, useState } from 'react';
 import { Home, ClipboardList, Map as MapIcon, AlertTriangle, User } from 'lucide-react';
-import { auth as authApi, setToken, clearAuth, getStoredUser, setStoredUser } from './services/api';
+import { auth as authApi, volunteer as volunteerApi, setToken, clearAuth, getStoredUser, setStoredUser } from './services/api';
 import HomePage from './pages/HomePage';
 import TasksPage from './pages/TasksPage';
 import MapPage from './pages/MapPage';
@@ -22,6 +22,17 @@ function AuthProvider({ children }) {
     try {
       const res = await authApi.googleLogin(token, role);
       setToken(res.access_token);
+      
+      // Auto-setup profile if new user
+      if (res.is_new_user) {
+        try {
+          await volunteerApi.setup({
+            phone: "", skills: ["General Support"], has_vehicle: false,
+            vehicle_type: "none", latitude: 0, longitude: 0, address: ""
+          });
+        } catch (e) { console.error("Auto-setup failed:", e); }
+      }
+
       setStoredUser(res.user);
       setUser(res.user);
       return res;
@@ -44,6 +55,15 @@ function AuthProvider({ children }) {
     try {
       const res = await authApi.emailRegister(email, password, name);
       setToken(res.access_token);
+
+      // Setup volunteer profile immediately
+      try {
+        await volunteerApi.setup({
+          phone: "", skills: ["General Support"], has_vehicle: false,
+          vehicle_type: "none", latitude: 0, longitude: 0, address: ""
+        });
+      } catch (e) { console.error("Initial profile setup failed:", e); }
+
       setStoredUser(res.user);
       setUser(res.user);
       return res;
