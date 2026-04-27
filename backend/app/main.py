@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse
 
 from .config import get_settings
 from .database import init_db
+from .seeder import seed_database
 
 # Setup logging
 logging.basicConfig(
@@ -43,6 +44,9 @@ async def lifespan(app: FastAPI):
 
     # Initialize database tables
     init_db()
+    
+    # Seed database with demo data
+    seed_database()
 
     logger.info("✅ Database initialized")
     logger.info(f"📁 Uploads directory: {os.path.abspath(settings.UPLOAD_DIR)}")
