@@ -62,17 +62,15 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> list[str]:
-        origins = [
-            self.FRONTEND_LANDING_URL,
-            self.FRONTEND_ADMIN_URL,
-            self.FRONTEND_VOLUNTEER_URL,
+        return [
             "http://localhost:5173",
             "http://localhost:5174",
-            "http://localhost:5175"
+            "http://localhost:5175",
+            "http://localhost:3000",
+            "https://sevasetu-landing.onrender.com",
+            "https://sevasetu-admin.onrender.com",
+            "https://sevasetu-volunteer.onrender.com",
         ]
-        if self.DEBUG:
-            origins.append("http://localhost:3000")
-        return origins
 
     class Config:
         env_file = "../.env"
