@@ -106,35 +106,36 @@ async def extract_text_from_image(image_path: str) -> Dict[str, Any]:
 
         prompt = """You are an OCR + data extraction system for an NGO volunteer coordination platform.
 
-Analyze this image of a paper survey or field report and extract ALL text from it.
+Analyze this image of a handwritten paper survey or field report and extract ALL text from it.
+The text often follows this pattern:
+- A location (e.g., "Ahmedabad, Isanpur" or "Bandra, Mumbai")
+- A problem/need (e.g., "Problem: need 50 food packets" or "Need: medical help")
+- An urgency level (e.g., "Urgency: High" or "Urgency: Moderate")
+
 The text may be written in ANY language including Hindi, Gujarati, Marathi, Urdu, or English.
 Regardless of the original language, ALL output fields must be in ENGLISH.
 
-Then, from the extracted text, identify and structure the following information:
-
-Return your response ONLY as a JSON object (no markdown, no code blocks) with this exact structure:
+Structure the extracted information into the following JSON format:
 {
-    "raw_text": "the complete extracted text from the image, transliterated/translated to English",
-    "original_language": "detected language of the handwriting (e.g. Hindi, Gujarati, English, Mixed)",
+    "raw_text": "the complete extracted text from the image, translated to English",
+    "original_language": "detected language (e.g. Hindi, Gujarati, English)",
     "structured_data": {
-        "title": "a short English summary title of the need/issue (max 100 chars)",
-        "description": "detailed English description of the need",
+        "title": "Use the text after 'Problem:' or 'Need:' as the title. If missing, summarize the main issue in 5-8 words.",
+        "description": "Full detailed description of the situation.",
         "category": "one of: medical, food, shelter, rescue, education, clothing, sanitation, water, other",
-        "urgency": 3,
-        "location_text": "any location/address mentioned (keep original place names)",
+        "urgency": 1-5 (Map 'Critical' to 5, 'High' to 4, 'Moderate' to 3, 'Low' to 2, 'Info' to 1),
+        "location_text": "The location mentioned (e.g. 'Isanpur, Ahmedabad'). Ensure this field is populated if a place name is visible.",
         "people_affected": 1,
         "key_issues": ["issue1", "issue2"]
     },
-    "confidence": 0.85
+    "confidence": 0.0 to 1.0
 }
 
 Rules:
-- urgency is 1-5 (1=low, 5=critical/life-threatening)
-- people_affected should be a number, default to 1 if unclear
-- Extract ALL readable text, even if partially obscured
-- If text is in Hindi/Gujarati/Marathi, translate the meaning to English but keep location names as-is
-- If the image is not a survey/report, still extract any text and set category to "other"
-- confidence is 0.0-1.0 based on how clear and complete the extraction is"""
+- If a line looks like an address or city (like 'Ahmedabad, Isanpur'), put it in 'location_text'.
+- If a line starts with 'Problem:', 'Need:', or 'Issue:', use that as the 'title'.
+- Translate Hindi/Gujarati to English but keep names of places exactly as they are written.
+- Ensure the JSON is valid and only return the JSON object."""
 
         contents = [{
             "parts": [
