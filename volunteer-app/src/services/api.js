@@ -18,7 +18,15 @@ async function apiFetch(endpoint, options = {}) {
 
   const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
   if (res.status === 401) { clearAuth(); window.location.href = '/login'; throw new Error('Session expired'); }
-  if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error(err.error || err.detail || `HTTP ${res.status}`); }
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    let msg = err.error || err.detail || `HTTP ${res.status}`;
+    if (Array.isArray(err.detail) && err.detail.length > 0) {
+      // Extract the first validation error message (e.g. "field is required")
+      msg = err.detail[0].msg || JSON.stringify(err.detail);
+    }
+    throw new Error(msg);
+  }
   return res.json();
 }
 

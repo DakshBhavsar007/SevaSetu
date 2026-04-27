@@ -61,8 +61,12 @@ async function apiFetch(endpoint, options = {}) {
   }
 
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: 'Request failed' }));
-    throw new Error(error.error || error.detail || `HTTP ${res.status}`);
+    const error = await res.json().catch(() => ({}));
+    let msg = error.error || error.detail || `HTTP ${res.status}`;
+    if (Array.isArray(error.detail) && error.detail.length > 0) {
+      msg = error.detail[0].msg || JSON.stringify(error.detail);
+    }
+    throw new Error(msg);
   }
 
   return res.json();
