@@ -35,8 +35,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./smartalloc.db"
 
     # --- CORS ---
-    FRONTEND_ADMIN_URL: str = "http://localhost:5173"
-    FRONTEND_VOLUNTEER_URL: str = "http://localhost:5174"
+    FRONTEND_LANDING_URL: str = "https://sevasetu-landing.onrender.com"
+    FRONTEND_ADMIN_URL: str = "https://sevasetu-admin.onrender.com"
+    FRONTEND_VOLUNTEER_URL: str = "https://sevasetu-volunteer.onrender.com"
 
     # --- File Uploads ---
     UPLOAD_DIR: str = "./uploads"
@@ -61,7 +62,14 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> list[str]:
-        origins = [self.FRONTEND_ADMIN_URL, self.FRONTEND_VOLUNTEER_URL, "http://localhost:5175"]
+        origins = [
+            self.FRONTEND_LANDING_URL,
+            self.FRONTEND_ADMIN_URL,
+            self.FRONTEND_VOLUNTEER_URL,
+            "http://localhost:5173",
+            "http://localhost:5174",
+            "http://localhost:5175"
+        ]
         if self.DEBUG:
             origins.append("http://localhost:3000")
         return origins

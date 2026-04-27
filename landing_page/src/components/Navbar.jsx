@@ -47,11 +47,11 @@ const Navbar = ({ onNavigate }) => {
   }, [scrollY]);
 
   const handleInstallApp = () => {
-    window.location.href = 'http://localhost:5174/';
+    window.location.href = 'https://sevasetu-volunteer.onrender.com/';
   };
 
   const handleDashboard = () => {
-    window.location.href = 'http://localhost:5173/';
+    window.location.href = 'https://sevasetu-admin.onrender.com/';
   };
 
   return (

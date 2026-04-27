@@ -47,7 +47,7 @@ const FinalCTA = () => {
             className="btn-cta-primary"
             whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(59, 130, 246, 0.6)" }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => { window.location.href = 'http://localhost:5174/'; }}
+            onClick={() => { window.location.href = 'https://sevasetu-volunteer.onrender.com/'; }}
           >
             Install Volunteer App
           </motion.button>
@@ -55,7 +55,7 @@ const FinalCTA = () => {
             className="btn-cta-secondary"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => { window.location.href = 'http://localhost:5173/'; }}
+            onClick={() => { window.location.href = 'https://sevasetu-admin.onrender.com/'; }}
           >
             Open Dashboard
           </motion.button>
