@@ -80,15 +80,20 @@ app = FastAPI(
 # ============================================================
 
 # CORS
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[
+        "https://sevasetu-volunteer.onrender.com",
+        "https://sevasetu-admin.onrender.com",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ],
+    allow_credentials=True,  # ✅ Ab kaam karega
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["X-Total-Count"],
 )
-
 
 # Global error handler
 @app.exception_handler(Exception)
