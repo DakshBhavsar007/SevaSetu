@@ -61,6 +61,21 @@ export default function Layout() {
         </nav>
 
         <div className="sidebar-footer">
+          {/* External Link */}
+          <a 
+            href="https://sevasetu-landing.onrender.com" 
+            style={{ 
+              display: 'flex', alignItems: 'center', gap: '10px', 
+              padding: '10px', marginBottom: '16px', borderRadius: '8px',
+              background: 'rgba(5, 150, 105, 0.1)', color: 'var(--accent-green)',
+              fontSize: '13px', fontWeight: 600, textDecoration: 'none',
+              border: '1px solid rgba(5, 150, 105, 0.2)'
+            }}
+          >
+            <LayoutDashboard size={16} />
+            Go to Website
+          </a>
+
           {/* Theme Toggle */}
           <div className="theme-toggle">
             <button

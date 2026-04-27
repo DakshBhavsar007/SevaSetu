@@ -52,19 +52,27 @@ export default function HomePage() {
           }}>
             Hi, {user?.name?.split(' ')[0] || 'Volunteer'} <Hand size={28} color="#f59e0b" style={{ display: 'inline-block', animation: 'wave 2s infinite transform-origin: bottom center' }} />
           </h1>
-          <div style={{ color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {profile ? (
-              <span style={{
-                background: profile.availability === 'available' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
-                color: profile.availability === 'available' ? 'var(--accent-green)' : 'var(--accent-amber)',
-                padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700,
-                border: `1px solid ${profile.availability === 'available' ? 'var(--accent-green)' : 'var(--accent-amber)'}40`,
-                display: 'inline-flex', alignItems: 'center', gap: '6px'
-              }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'currentColor', boxShadow: '0 0 8px currentColor' }} />
-                {profile.availability.toUpperCase()}
-              </span>
-            ) : 'Set up your profile to get started'}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {profile ? (
+                <span style={{
+                  background: profile.availability === 'available' ? 'rgba(16,185,129,0.15)' : 'rgba(245,158,11,0.15)',
+                  color: profile.availability === 'available' ? 'var(--accent-green)' : 'var(--accent-amber)',
+                  padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 700,
+                  border: `1px solid ${profile.availability === 'available' ? 'var(--accent-green)' : 'var(--accent-amber)'}40`,
+                  display: 'inline-flex', alignItems: 'center', gap: '6px'
+                }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'currentColor', boxShadow: '0 0 8px currentColor' }} />
+                  {profile.availability.toUpperCase()}
+                </span>
+              ) : 'Set up your profile to get started'}
+            </div>
+            <a 
+              href="https://sevasetu-landing.onrender.com" 
+              style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}
+            >
+              Exit to Website
+            </a>
           </div>
         </div>
       </div>
