@@ -1,0 +1,33 @@
+services:
+  # Backend API
+  - type: web
+    name: sevasetu-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - fromGroup: sevasetu-env-vars
+
+  # Landing Page
+  - type: static
+    name: sevasetu-landing
+    rootDir: landing_page
+    buildCommand: npm install && npm run build
+    publishDir: dist
+
+  # Volunteer App
+  - type: static
+    name: sevasetu-volunteer
+    rootDir: volunteer-app
+    buildCommand: npm install && npm run build
+    publishDir: dist
+
+  # Admin Dashboard
+  - type: static
+    name: sevasetu-admin
+    rootDir: admin-dashboard
+    buildCommand: npm install && npm run build
+    publishDir: dist
