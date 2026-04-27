@@ -2,7 +2,7 @@
  * API service layer — all backend communication goes through here.
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://sevasetu-bnup.onrender.com/api/v1';
+const API_BASE = 'https://sevasetu-bnup.onrender.com/api/v1';
 
 // Get stored JWT token
 function getToken() {
