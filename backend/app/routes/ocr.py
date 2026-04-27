@@ -44,7 +44,7 @@ def _validate_upload(file: UploadFile):
     return ext
 
 
-@router.post("/extract", response_model=OCRExtractResponse)
+@router.post("/extract/", response_model=OCRExtractResponse)
 async def extract_from_image(
     request: Request,
     file: UploadFile = File(..., description="Paper survey or field report image"),
@@ -107,7 +107,7 @@ async def extract_from_image(
     )
 
 
-@router.post("/extract-and-create", response_model=NeedResponse)
+@router.post("/extract-and-create/", response_model=NeedResponse)
 async def extract_and_create_need(
     request: Request,
     file: UploadFile = File(..., description="Paper survey or field report image"),

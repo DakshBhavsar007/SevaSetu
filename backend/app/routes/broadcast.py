@@ -169,7 +169,7 @@ async def list_broadcasts(
     return results
 
 
-@router.get("/{broadcast_id}", response_model=BroadcastResponse)
+@router.get("/{broadcast_id}/", response_model=BroadcastResponse)
 async def get_broadcast(
     broadcast_id: str,
     db: Session = Depends(get_db),

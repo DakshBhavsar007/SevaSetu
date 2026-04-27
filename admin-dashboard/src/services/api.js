@@ -77,7 +77,7 @@ async function apiFetch(endpoint, options = {}) {
 // ============================================================
 export const auth = {
   googleLogin: (idToken, role = 'admin') =>
-    apiFetch('/auth/google', {
+    apiFetch('/auth/google/', {
       method: 'POST',
       body: JSON.stringify({ id_token: idToken, role }),
     }),
@@ -94,9 +94,9 @@ export const auth = {
       body: JSON.stringify({ email, password }),
     }),
 
-  getMe: () => apiFetch('/auth/me'),
+  getMe: () => apiFetch('/auth/me/'),
 
-  logout: () => apiFetch('/auth/logout', { method: 'POST' }),
+  logout: () => apiFetch('/auth/logout/', { method: 'POST' }),
 };
 
 // ============================================================
@@ -110,21 +110,21 @@ export const needs = {
 
   getForMap: (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    return apiFetch(`/needs/map?${query}`);
+    return apiFetch(`/needs/map/?${query}`);
   },
 
-  get: (id) => apiFetch(`/needs/${id}`),
+  get: (id) => apiFetch(`/needs/${id}/`),
 
   create: (data) =>
     apiFetch('/needs/', { method: 'POST', body: JSON.stringify(data) }),
 
   update: (id, data) =>
-    apiFetch(`/needs/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+    apiFetch(`/needs/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
 
   delete: (id) =>
-    apiFetch(`/needs/${id}`, { method: 'DELETE' }),
+    apiFetch(`/needs/${id}/`, { method: 'DELETE' }),
 
-  getCategories: () => apiFetch('/needs/categories'),
+  getCategories: () => apiFetch('/needs/categories/'),
 };
 
 // ============================================================
@@ -138,14 +138,14 @@ export const volunteers = {
 
   getForMap: (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    return apiFetch(`/volunteers/map?${query}`);
+    return apiFetch(`/volunteers/map/?${query}`);
   },
 
-  get: (id) => apiFetch(`/volunteers/${id}`),
+  get: (id) => apiFetch(`/volunteers/${id}/`),
 
   getTasks: (id, params = {}) => {
     const query = new URLSearchParams(params).toString();
-    return apiFetch(`/volunteers/${id}/tasks?${query}`);
+    return apiFetch(`/volunteers/${id}/tasks/?${query}`);
   },
 };
 
@@ -154,22 +154,22 @@ export const volunteers = {
 // ============================================================
 export const matching = {
   getSuggestions: (needId, limit = 5) =>
-    apiFetch(`/matching/suggest/${needId}?limit=${limit}`),
+    apiFetch(`/matching/suggest/${needId}/?limit=${limit}`),
 
   assign: (data) =>
-    apiFetch('/matching/assign', { method: 'POST', body: JSON.stringify(data) }),
+    apiFetch('/matching/assign/', { method: 'POST', body: JSON.stringify(data) }),
 
   updateStatus: (assignmentId, data) =>
-    apiFetch(`/matching/assignment/${assignmentId}/status`, {
+    apiFetch(`/matching/assignment/${assignmentId}/status/`, {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
 
-  getAssignment: (id) => apiFetch(`/matching/assignment/${id}`),
+  getAssignment: (id) => apiFetch(`/matching/assignment/${id}/`),
 
   listAssignments: (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    return apiFetch(`/matching/assignments?${query}`);
+    return apiFetch(`/matching/assignments/?${query}`);
   },
 };
 
@@ -177,16 +177,16 @@ export const matching = {
 // ANALYTICS
 // ============================================================
 export const analytics = {
-  getSummary: () => apiFetch('/analytics/summary'),
-  getCategories: () => apiFetch('/analytics/categories'),
+  getSummary: () => apiFetch('/analytics/summary/'),
+  getCategories: () => apiFetch('/analytics/categories/'),
   getHeatmap: (params = {}) => {
     const query = new URLSearchParams(params).toString();
-    return apiFetch(`/analytics/heatmap?${query}`);
+    return apiFetch(`/analytics/heatmap/?${query}`);
   },
-  getTimeline: (days = 30) => apiFetch(`/analytics/timeline?days=${days}`),
-  getResponseTimes: () => apiFetch('/analytics/response-times'),
-  getAISummary: () => apiFetch('/analytics/ai-summary'),
-  getImpact: (days = 7) => apiFetch(`/analytics/impact?days=${days}`),
+  getTimeline: (days = 30) => apiFetch(`/analytics/timeline/?days=${days}`),
+  getResponseTimes: () => apiFetch('/analytics/response-times/'),
+  getAISummary: () => apiFetch('/analytics/ai-summary/'),
+  getImpact: (days = 7) => apiFetch(`/analytics/impact/?days=${days}`),
 };
 
 // ============================================================
@@ -196,13 +196,13 @@ export const ocr = {
   extract: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return apiFetch('/ocr/extract', { method: 'POST', body: formData });
+    return apiFetch('/ocr/extract/', { method: 'POST', body: formData });
   },
 
   extractAndCreate: (file, lat = 0, lon = 0) => {
     const formData = new FormData();
     formData.append('file', file);
-    return apiFetch(`/ocr/extract-and-create?latitude=${lat}&longitude=${lon}`, {
+    return apiFetch(`/ocr/extract-and-create/?latitude=${lat}&longitude=${lon}`, {
       method: 'POST',
       body: formData,
     });
@@ -221,5 +221,5 @@ export const broadcast = {
     return apiFetch(`/broadcast/?${query}`);
   },
 
-  get: (id) => apiFetch(`/broadcast/${id}`),
+  get: (id) => apiFetch(`/broadcast/${id}/`),
 };

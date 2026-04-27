@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
 
-@router.get("/summary", response_model=DashboardSummary)
+@router.get("/summary/")
 async def get_dashboard_summary(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -93,7 +93,7 @@ async def get_dashboard_summary(
     )
 
 
-@router.get("/categories", response_model=List[CategoryBreakdown])
+@router.get("/categories/", response_model=List[CategoryBreakdown])
 async def get_category_breakdown(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -125,7 +125,7 @@ async def get_category_breakdown(
     return results
 
 
-@router.get("/heatmap", response_model=List[HeatmapPoint])
+@router.get("/heatmap/", response_model=List[HeatmapPoint])
 async def get_heatmap_data(
     status_filter: Optional[str] = Query(default=None, alias="status"),
     category: Optional[str] = Query(default=None),
@@ -166,7 +166,7 @@ async def get_heatmap_data(
     ]
 
 
-@router.get("/timeline", response_model=List[TimelinePoint])
+@router.get("/timeline/", response_model=List[TimelinePoint])
 async def get_timeline(
     days: int = Query(default=30, ge=1, le=365),
     db: Session = Depends(get_db),
@@ -202,7 +202,7 @@ async def get_timeline(
     return result
 
 
-@router.get("/response-times")
+@router.get("/response-times/")
 async def get_response_times(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_admin),
@@ -240,7 +240,7 @@ async def get_response_times(
     return result
 
 
-@router.get("/ai-summary")
+@router.get("/ai-summary/")
 async def get_ai_summary(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_admin),
@@ -268,7 +268,7 @@ async def get_ai_summary(
     return {"summary": summary, "needs_analyzed": len(needs_data)}
 
 
-@router.get("/impact")
+@router.get("/impact/")
 async def get_impact_stats(
     days: int = Query(default=7, ge=1, le=90),
     db: Session = Depends(get_db),
@@ -355,7 +355,7 @@ async def get_impact_stats(
     }
 
 
-@router.get("/public-stats")
+@router.get("/public-stats/")
 async def get_public_stats(db: Session = Depends(get_db)):
     """Public stats for the landing page."""
     active_volunteers = db.query(func.count(Volunteer.id)).filter(
@@ -383,7 +383,7 @@ async def get_public_stats(db: Session = Depends(get_db)):
         "user_rating": round(avg_rating, 1)
     }
 
-@router.get("/public-showcase")
+@router.get("/public-showcase/")
 async def get_public_showcase(db: Session = Depends(get_db)):
     """Public data for the landing page showcase."""
     from ..models import User

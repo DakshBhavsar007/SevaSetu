@@ -55,7 +55,7 @@ def _vol_to_response(vol: Volunteer, db: Session) -> VolunteerResponse:
     )
 
 
-@router.post("/setup", response_model=VolunteerResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/setup/", response_model=VolunteerResponse, status_code=status.HTTP_201_CREATED)
 async def setup_volunteer_profile(
     body: VolunteerCreateRequest,
     request: Request,
@@ -167,7 +167,7 @@ async def list_volunteers(
     return [_vol_to_response(v, db) for v in volunteers]
 
 
-@router.get("/map", response_model=List[VolunteerBriefResponse])
+@router.get("/map/", response_model=List[VolunteerBriefResponse])
 async def list_volunteers_for_map(
     availability: Optional[VolunteerAvailability] = Query(default=None),
     db: Session = Depends(get_db),
@@ -199,7 +199,7 @@ async def list_volunteers_for_map(
     return results
 
 
-@router.get("/me", response_model=VolunteerResponse)
+@router.get("/me/", response_model=VolunteerResponse)
 async def get_my_profile(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -211,7 +211,7 @@ async def get_my_profile(
     return _vol_to_response(vol, db)
 
 
-@router.get("/{volunteer_id}", response_model=VolunteerResponse)
+@router.get("/{volunteer_id}/", response_model=VolunteerResponse)
 async def get_volunteer(
     volunteer_id: str,
     db: Session = Depends(get_db),
@@ -224,7 +224,7 @@ async def get_volunteer(
     return _vol_to_response(vol, db)
 
 
-@router.patch("/{volunteer_id}", response_model=VolunteerResponse)
+@router.patch("/{volunteer_id}/", response_model=VolunteerResponse)
 async def update_volunteer(
     volunteer_id: str,
     body: VolunteerUpdateRequest,
@@ -256,7 +256,7 @@ async def update_volunteer(
     return _vol_to_response(vol, db)
 
 
-@router.patch("/{volunteer_id}/location", response_model=MessageResponse)
+@router.patch("/{volunteer_id}/location/", response_model=MessageResponse)
 async def update_location(
     volunteer_id: str,
     body: VolunteerLocationUpdate,
@@ -281,7 +281,7 @@ async def update_location(
     return MessageResponse(message="Location updated")
 
 
-@router.patch("/{volunteer_id}/availability", response_model=MessageResponse)
+@router.patch("/{volunteer_id}/availability/", response_model=MessageResponse)
 async def update_availability(
     volunteer_id: str,
     body: VolunteerAvailabilityUpdate,
@@ -316,7 +316,7 @@ async def update_availability(
     return MessageResponse(message=f"Availability changed: {old_status} → {body.availability.value}")
 
 
-@router.patch("/{volunteer_id}/fcm-token", response_model=MessageResponse)
+@router.patch("/{volunteer_id}/fcm-token/", response_model=MessageResponse)
 async def update_fcm_token(
     volunteer_id: str,
     body: VolunteerFCMUpdate,
@@ -338,7 +338,7 @@ async def update_fcm_token(
     return MessageResponse(message="FCM token updated")
 
 
-@router.get("/{volunteer_id}/tasks", response_model=List[AssignmentResponse])
+@router.get("/{volunteer_id}/tasks/", response_model=List[AssignmentResponse])
 async def get_volunteer_tasks(
     volunteer_id: str,
     status_filter: Optional[str] = Query(default=None, alias="status"),

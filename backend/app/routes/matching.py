@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/matching", tags=["Matching & Assignments"])
 
 
-@router.get("/suggest/{need_id}", response_model=MatchSuggestionsResponse)
+@router.get("/suggest/{need_id}/", response_model=MatchSuggestionsResponse)
 async def get_match_suggestions(
     need_id: str,
     limit: int = Query(default=5, ge=1, le=20),
@@ -82,7 +82,7 @@ async def get_match_suggestions(
     )
 
 
-@router.post("/assign", response_model=AssignmentResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/assign/", response_model=AssignmentResponse, status_code=status.HTTP_201_CREATED)
 async def create_assignment(
     body: AssignmentCreateRequest,
     request: Request,
@@ -191,7 +191,7 @@ async def create_assignment(
     )
 
 
-@router.patch("/assignment/{assignment_id}/status", response_model=AssignmentResponse)
+@router.patch("/assignment/{assignment_id}/status/", response_model=AssignmentResponse)
 async def update_assignment_status(
     assignment_id: str,
     body: AssignmentStatusUpdate,
@@ -313,7 +313,7 @@ async def update_assignment_status(
     )
 
 
-@router.get("/assignment/{assignment_id}", response_model=AssignmentResponse)
+@router.get("/assignment/{assignment_id}/", response_model=AssignmentResponse)
 async def get_assignment(
     assignment_id: str,
     db: Session = Depends(get_db),
@@ -349,7 +349,7 @@ async def get_assignment(
     )
 
 
-@router.get("/assignments", response_model=List[AssignmentResponse])
+@router.get("/assignments/", response_model=List[AssignmentResponse])
 async def list_assignments(
     status_filter: Optional[str] = Query(default=None, alias="status"),
     need_id: Optional[str] = Query(default=None),

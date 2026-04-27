@@ -176,7 +176,7 @@ async def list_needs(
     return [_need_to_response(n, db) for n in needs]
 
 
-@router.get("/map", response_model=List[NeedBriefResponse])
+@router.get("/map/", response_model=List[NeedBriefResponse])
 async def list_needs_for_map(
     category: Optional[NeedCategory] = Query(default=None),
     status_filter: Optional[NeedStatus] = Query(default=None, alias="status"),
@@ -198,7 +198,7 @@ async def list_needs_for_map(
     return [NeedBriefResponse.model_validate(n) for n in needs]
 
 
-@router.get("/categories")
+@router.get("/categories/")
 async def get_categories():
     """Return all valid need categories with descriptions."""
     return {
@@ -216,7 +216,7 @@ async def get_categories():
     }
 
 
-@router.get("/{need_id}", response_model=NeedResponse)
+@router.get("/{need_id}/", response_model=NeedResponse)
 async def get_need(
     need_id: str,
     db: Session = Depends(get_db),
@@ -229,7 +229,7 @@ async def get_need(
     return _need_to_response(need, db)
 
 
-@router.patch("/{need_id}", response_model=NeedResponse)
+@router.patch("/{need_id}/", response_model=NeedResponse)
 async def update_need(
     need_id: str,
     body: NeedUpdateRequest,
@@ -300,7 +300,7 @@ async def update_need(
     return _need_to_response(need, db)
 
 
-@router.delete("/{need_id}", response_model=MessageResponse)
+@router.delete("/{need_id}/", response_model=MessageResponse)
 async def delete_need(
     need_id: str,
     request: Request,
