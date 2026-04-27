@@ -33,7 +33,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post("/google", response_model=AuthResponse)
+@router.post("/google/", response_model=AuthResponse)
 async def google_login(
     body: GoogleAuthRequest,
     request: Request,
@@ -116,7 +116,7 @@ async def google_login(
     )
 
 
-@router.post("/register", response_model=AuthResponse)
+@router.post("/register/", response_model=AuthResponse)
 async def email_register(
     body: EmailRegisterRequest,
     request: Request,
@@ -171,7 +171,7 @@ async def email_register(
     )
 
 
-@router.post("/login", response_model=AuthResponse)
+@router.post("/login/", response_model=AuthResponse)
 async def email_login(
     body: EmailLoginRequest,
     request: Request,
@@ -222,13 +222,13 @@ async def email_login(
     )
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me/", response_model=UserResponse)
 async def get_me(current_user: User = Depends(get_current_user)):
     """Get the current authenticated user's profile."""
     return UserResponse.model_validate(current_user)
 
 
-@router.patch("/me", response_model=UserResponse)
+@router.patch("/me/", response_model=UserResponse)
 async def update_me(
     body: UserUpdateRequest,
     current_user: User = Depends(get_current_user),
@@ -247,7 +247,7 @@ async def update_me(
     return UserResponse.model_validate(current_user)
 
 
-@router.post("/logout", response_model=MessageResponse)
+@router.post("/logout/", response_model=MessageResponse)
 async def logout(
     request: Request,
     current_user: User = Depends(get_current_user),

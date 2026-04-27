@@ -79,13 +79,13 @@ export const auth = {
     }),
 
   emailRegister: (email, password, name, role = 'admin') =>
-    apiFetch('/auth/register', {
+    apiFetch('/auth/register/', {
       method: 'POST',
       body: JSON.stringify({ email, password, name, role }),
     }),
 
   emailLogin: (email, password) =>
-    apiFetch('/auth/login', {
+    apiFetch('/auth/login/', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
