@@ -102,7 +102,15 @@ def seed():
     init_db()
     db = SessionLocal()
 
-    print("Seeding database with demo data...\n")
+    print("Clearing existing data...")
+    db.query(Assignment).delete()
+    db.query(Need).delete()
+    db.query(Volunteer).delete()
+    db.query(Broadcast).delete()
+    db.query(User).delete()
+    db.commit()
+
+    print("Seeding database with fresh demo data...\n")
 
     # --- ADMIN USER ---
     admin_user = User(
