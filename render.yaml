@@ -12,22 +12,22 @@ services:
       - fromGroup: sevasetu-env-vars
 
   # Landing Page
-  - type: static_site
+  - type: static
     name: sevasetu-landing
     rootDir: landing_page
     buildCommand: npm install && npm run build
-    publishDir: dist
+    staticPublishPath: dist
 
   # Volunteer App
-  - type: static_site
+  - type: static
     name: sevasetu-volunteer
     rootDir: volunteer-app
     buildCommand: npm install && npm run build
-    publishDir: dist
+    staticPublishPath: dist
 
   # Admin Dashboard
-  - type: static_site
+  - type: static
     name: sevasetu-admin
     rootDir: admin-dashboard
     buildCommand: npm install && npm run build
-    publishDir: dist
+    staticPublishPath: dist
