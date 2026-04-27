@@ -8,26 +8,29 @@ services:
     rootDir: backend
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.0
+        value: "3.10.0"
       - fromGroup: sevasetu-env-vars
 
   # Landing Page
-  - type: static
+  - type: web
     name: sevasetu-landing
+    runtime: static
     rootDir: landing_page
     buildCommand: npm install && npm run build
     staticPublishPath: dist
 
   # Volunteer App
-  - type: static
+  - type: web
     name: sevasetu-volunteer
+    runtime: static
     rootDir: volunteer-app
     buildCommand: npm install && npm run build
     staticPublishPath: dist
 
   # Admin Dashboard
-  - type: static
+  - type: web
     name: sevasetu-admin
+    runtime: static
     rootDir: admin-dashboard
     buildCommand: npm install && npm run build
     staticPublishPath: dist
