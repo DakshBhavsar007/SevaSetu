@@ -34,28 +34,29 @@ export const auth = {
   googleLogin: (idToken) => apiFetch('/auth/google/', { method: 'POST', body: JSON.stringify({ id_token: idToken, role: 'volunteer' }) }),
   emailRegister: (email, password, name) => apiFetch('/auth/register/', { method: 'POST', body: JSON.stringify({ email, password, name, role: 'volunteer' }) }),
   emailLogin: (email, password) => apiFetch('/auth/login/', { method: 'POST', body: JSON.stringify({ email, password }) }),
-  getMe: () => apiFetch('/auth/me'),
-  logout: () => apiFetch('/auth/logout', { method: 'POST' }),
+  getMe: () => apiFetch('/auth/me/'),
+  logout: () => apiFetch('/auth/logout/', { method: 'POST' }),
 };
 
 export const volunteer = {
-  getMyProfile: () => apiFetch('/volunteers/me'),
-  setup: (data) => apiFetch('/volunteers/setup', { method: 'POST', body: JSON.stringify(data) }),
-  updateLocation: (id, data) => apiFetch(`/volunteers/${id}/location`, { method: 'PATCH', body: JSON.stringify(data) }),
-  updateAvailability: (id, data) => apiFetch(`/volunteers/${id}/availability`, { method: 'PATCH', body: JSON.stringify(data) }),
-  updateFCM: (id, data) => apiFetch(`/volunteers/${id}/fcm-token`, { method: 'PATCH', body: JSON.stringify(data) }),
-  getMyTasks: (id, params = {}) => { const q = new URLSearchParams(params).toString(); return apiFetch(`/volunteers/${id}/tasks?${q}`); },
+  getMyProfile: () => apiFetch('/volunteers/me/'),
+  setup: (data) => apiFetch('/volunteers/setup/', { method: 'POST', body: JSON.stringify(data) }),
+  updateLocation: (id, data) => apiFetch(`/volunteers/${id}/location/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  updateAvailability: (id, data) => apiFetch(`/volunteers/${id}/availability/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  updateFCM: (id, data) => apiFetch(`/volunteers/${id}/fcm-token/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  getMyTasks: (id, params = {}) => { const q = new URLSearchParams(params).toString(); return apiFetch(`/volunteers/${id}/tasks/?${q}`); },
 };
 
 export const needs = {
   create: (data) => apiFetch('/needs/', { method: 'POST', body: JSON.stringify(data) }),
   list: (params = {}) => { const q = new URLSearchParams(params).toString(); return apiFetch(`/needs/?${q}`); },
-  getCategories: () => apiFetch('/needs/categories'),
+  getForMap: (params = {}) => { const q = new URLSearchParams(params).toString(); return apiFetch(`/needs/map/?${q}`); },
+  getCategories: () => apiFetch('/needs/categories/'),
 };
 
 export const assignments = {
-  get: (id) => apiFetch(`/matching/assignment/${id}`),
-  updateStatus: (id, data) => apiFetch(`/matching/assignment/${id}/status`, { method: 'PATCH', body: JSON.stringify(data) }),
+  get: (id) => apiFetch(`/matching/assignment/${id}/`),
+  updateStatus: (id, data) => apiFetch(`/matching/assignment/${id}/status/`, { method: 'PATCH', body: JSON.stringify(data) }),
 };
 
 export const broadcast = {

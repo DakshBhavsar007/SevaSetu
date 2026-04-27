@@ -2,8 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Map as MapIcon, MapPin, RefreshCw, Navigation } from 'lucide-react';
-
-const API_BASE = '/api/v1';
+import { needs as needsApi } from '../services/api';
 
 export default function MapPage() {
   const mapRef = useRef(null);
@@ -19,16 +18,8 @@ export default function MapPage() {
   // Load needs for map
   async function loadNeeds() {
     try {
-      const token = localStorage.getItem('vol_token');
-      const params = new URLSearchParams();
-      if (filter) params.set('category', filter);
-      const res = await fetch(`${API_BASE}/needs/map?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setNeeds(data);
-      }
+      const data = await needsApi.getForMap(filter ? { category: filter } : {});
+      setNeeds(data);
     } catch (e) {
       console.error('Failed to load needs:', e);
     }
