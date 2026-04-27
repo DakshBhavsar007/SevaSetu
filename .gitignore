@@ -45,3 +45,4 @@ firebase-credentials.json
 
 # Local config
 *.local
+*.resolved
