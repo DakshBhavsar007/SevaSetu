@@ -14,7 +14,7 @@ const HeroHeader = () => {
   const contentY = useTransform(smoothY, [0, 800], ['0%', '10%']);
   const opacity = useTransform(smoothY, [0, 500], [1, 0]);
 
-  const titleText = "Empowering communities through smart volunteering.";
+  const titleText = "One platform. Better impact.";
   const words = titleText.split(" ");
 
   const [stats, setStats] = useState({
@@ -96,7 +96,7 @@ const HeroHeader = () => {
         >
           <div className="badge-border-glow">
             <svg width="100%" height="100%" viewBox="0 0 200 40" preserveAspectRatio="none" style={{ position: 'absolute', inset: 0, overflow: 'visible' }}>
-              <rect x="1" y="1" width="198" height="38" rx="19" fill="none" stroke="white" strokeWidth="0.5" opacity="0.2"/>
+              <rect x="1" y="1" width="198" height="38" rx="19" fill="none" stroke="white" strokeWidth="0.5" opacity="0.2" />
               <motion.rect
                 x="1" y="1" width="198" height="38" rx="19"
                 fill="none" stroke="url(#badge-gradient2)" strokeWidth="2.5" strokeDasharray="60 140"
@@ -112,9 +112,7 @@ const HeroHeader = () => {
             </svg>
           </div>
           <div className="badge badge-dark">
-            <span className="badge-tag">LIVE</span>
-            <span className="badge-text" style={{ color: '#e2e8f0' }}>SevaSetu 1.0 is now live</span>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            <span className="badge-text">FOR COMMUNITIES</span>
           </div>
         </motion.div>
 
@@ -133,14 +131,13 @@ const HeroHeader = () => {
           ))}
         </motion.h1>
 
-        {/* Subtitle */}
         <motion.p
           className="hero-subtitle hero-subtitle-dark"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.4, duration: 1 }}
         >
-          Build efficient resource allocation workflows. Connect volunteers with NGOs and manage disaster relief operations with precision across your entire network.
+          From volunteer onboarding, to smart matching, to impact tracking—manage your entire social impact pipeline in one place.
         </motion.p>
 
         {/* CTA Buttons */}
