@@ -12,6 +12,8 @@
   justify-content: center;
   /* overflow:clip clips without blocking scroll events */
   overflow: clip;
+  /* Cinematic dark background to keep white text readable */
+  background: radial-gradient(circle at 50% 10%, #1a1e36 0%, #040612 80%);
 }
 
 /* Parallax Background */

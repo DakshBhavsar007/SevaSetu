@@ -25,17 +25,24 @@ const HeroHeader = () => {
   });
 
   useEffect(() => {
-    fetch('https://sevasetu-bnup.onrender.com/api/v1/analytics/public-stats')
-      .then(res => res.json())
-      .then(data => {
-        setStats({
-          active_volunteers: data.active_volunteers.toLocaleString(),
-          active_campaigns: data.active_campaigns.toLocaleString(),
-          task_completion: data.task_completion.toString(),
-          user_rating: data.user_rating.toString()
-        });
-      })
-      .catch(err => console.error("Error fetching stats:", err));
+    const fetchStats = () => {
+      fetch('https://sevasetu-bnup.onrender.com/api/v1/analytics/public-stats')
+        .then(res => res.json())
+        .then(data => {
+          setStats({
+            active_volunteers: data.active_volunteers.toLocaleString(),
+            active_campaigns: data.active_campaigns.toLocaleString(),
+            task_completion: data.task_completion.toString(),
+            user_rating: data.user_rating.toString()
+          });
+        })
+        .catch(err => console.error("Error fetching stats:", err));
+    };
+
+    fetchStats();
+    // Real-time polling every 3 seconds
+    const interval = setInterval(fetchStats, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -46,13 +53,7 @@ const HeroHeader = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 1.2 }}
     >
-      {/* Parallax Background Image */}
-      <motion.div
-        className="hero-bg-image"
-        style={{ y: bgY }}
-      />
-
-      {/* Multi-layer Overlay */}
+      {/* Multi-layer Overlay / Background Setup */}
       <div className="hero-overlay-bottom" />
       <div className="hero-overlay-top" />
 
