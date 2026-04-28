@@ -6,17 +6,26 @@
 
 ### Smart Disaster Response & Volunteer Coordination Platform
 
+[![GitHub stars](https://img.shields.io/github/stars/DakshBhavsar007/SevaSetu?style=flat&logo=github)](https://github.com/DakshBhavsar007/SevaSetu)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat)](https://github.com/DakshBhavsar007/SevaSetu)
 [![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react&logoColor=black)](https://reactjs.org)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat&logo=vite&logoColor=white)](https://vitejs.dev)
 [![SQLite](https://img.shields.io/badge/SQLite-Database-003B57?style=flat&logo=sqlite&logoColor=white)](https://sqlite.org)
-[![License](https://img.shields.io/badge/License-SIH%20Hackathon-orange?style=flat)](https://github.com/DakshBhavsar007/SevaSetu)
 
 > A full-stack, real-time platform that bridges **NGOs, admins, and volunteers** during disasters — with AI-powered matching, live maps, OCR scanning, and weather-based alerts.
 
 <br>
 <img src="./landing_page/src/assets/hero-image.jpeg" alt="SevaSetu Platform" width="100%"/>
+<br>
+## 🌐 Live Demo
+| Service | URL |
+|---|---|
+| 🏠 Landing Page | [sevasetu-landing.onrender.com](https://sevasetu-landing.onrender.com/) |
+| ⚙️ Backend API | [sevasetu-bnup.onrender.com/docs](https://sevasetu-bnup.onrender.com/docs) |
+| 📊 Admin Dashboard | [sevasetu-admin.onrender.com](https://sevasetu-admin.onrender.com/) |
+| 📱 Volunteer App | [sevasetu-volunteer.onrender.com](https://sevasetu-volunteer.onrender.com/) |
 
 </div>
 
