@@ -18,14 +18,25 @@
 
 <br>
 <img src="./landing_page/src/assets/hero-image.jpeg" alt="SevaSetu Platform" width="100%"/>
+
+</div>
+
 <br>
+
+<div align="center">
+
 ## 🌐 Live Demo
-| Service | URL |
-|---|---|
-| 🏠 Landing Page | [sevasetu-landing.onrender.com](https://sevasetu-landing.onrender.com/) |
-| ⚙️ Backend API | [sevasetu-bnup.onrender.com/docs](https://sevasetu-bnup.onrender.com/docs) |
-| 📊 Admin Dashboard | [sevasetu-admin.onrender.com](https://sevasetu-admin.onrender.com/) |
-| 📱 Volunteer App | [sevasetu-volunteer.onrender.com](https://sevasetu-volunteer.onrender.com/) |
+
+<table>
+<tr>
+<td align="center">🏠<br><b>Landing Page</b><br><a href="https://sevasetu-landing.onrender.com/">sevasetu-landing.onrender.com</a></td>
+<td align="center">⚙️<br><b>Backend API</b><br><a href="https://sevasetu-bnup.onrender.com/docs">sevasetu-bnup.onrender.com/docs</a></td>
+</tr>
+<tr>
+<td align="center">📊<br><b>Admin Dashboard</b><br><a href="https://sevasetu-admin.onrender.com/">sevasetu-admin.onrender.com</a></td>
+<td align="center">📱<br><b>Volunteer App</b><br><a href="https://sevasetu-volunteer.onrender.com/">sevasetu-volunteer.onrender.com</a></td>
+</tr>
+</table>
 
 </div>
 
