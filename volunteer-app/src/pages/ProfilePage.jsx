@@ -58,7 +58,11 @@ export default function ProfilePage() {
     setSaving(true);
     try {
       const data = { ...form };
-      if (!data.has_vehicle) data.vehicle_type = 'none';
+      if (!data.has_vehicle) {
+        data.vehicle_type = 'none';
+      } else if (data.vehicle_type === 'none') {
+        data.vehicle_type = 'bike'; // Default to bike if they check the box but don't pick
+      }
 
       // Detect location
       if (navigator.geolocation) {
