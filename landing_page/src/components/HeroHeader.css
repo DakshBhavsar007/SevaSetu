@@ -10,10 +10,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* overflow:clip clips without blocking scroll events */
   overflow: clip;
-  /* Clean white background as requested */
-  background: var(--bg);
+  /* Clean white background with a very subtle radial glow like the reference image */
+  background: radial-gradient(circle at 50% 50%, rgba(240, 247, 255, 0.5) 0%, #ffffff 100%);
 }
 
 /* Parallax Background */
@@ -34,17 +33,14 @@
   transform: translateZ(0);
 }
 
-/* Dark gradient overlay — navbar top stays readable */
 .hero-overlay-top {
   position: absolute;
   inset: 0;
+  /* Replaced dark gradient with a very subtle light fade to ensure navbar readability without making it look gray */
   background: linear-gradient(
     180deg,
-    rgba(4, 6, 18, 0.60) 0%,     /* under transparent navbar */
-    rgba(4, 6, 18, 0.20) 35%,
-    rgba(4, 6, 18, 0.10) 55%,
-    rgba(4, 6, 18, 0.55) 85%,
-    rgba(255,255,255, 0.0) 100%  /* bottom handled separately */
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0) 20%
   );
   z-index: 1;
   pointer-events: none;
@@ -82,8 +78,10 @@
 .hero-particle {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.9), rgba(251, 191, 36, 0.3));
-  box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.1);
+  /* Making particles much more subtle to match the clean theme */
+  opacity: 0.4;
 }
 
 /* Content layer */
@@ -110,10 +108,7 @@
 }
 
 .badge-border-glow {
-  position: absolute;
-  inset: -1px;
-  pointer-events: none;
-  z-index: 10;
+  display: none; /* Removed the moving glow for a cleaner aesthetic */
 }
 
 .badge {
@@ -162,7 +157,9 @@
 }
 
 .hero-title-dark {
-  color: #1a1c1e;
+  color: #000000;
+  letter-spacing: -0.04em;
+  font-weight: 800;
 }
 
 /* ====== SUBTITLE ====== */
@@ -174,7 +171,8 @@
 }
 
 .hero-subtitle-dark {
-  color: #6b7280;
+  color: #4b5563;
+  font-weight: 400;
 }
 
 /* ====== CTA BUTTONS ====== */
