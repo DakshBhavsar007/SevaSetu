@@ -14,26 +14,26 @@ const HeroHeader = () => {
   const contentY = useTransform(smoothY, [0, 800], ['0%', '10%']);
   const opacity = useTransform(smoothY, [0, 500], [1, 0]);
 
-  const titleText = "One platform. Better impact.";
+  const titleText = "Empowering communities through smart volunteering.";
   const words = titleText.split(" ");
 
   const [stats, setStats] = useState({
-    active_volunteers: "2,847",
-    active_campaigns: "156",
-    task_completion: "98.7",
-    user_rating: "4.9"
+    active_volunteers: "0",
+    active_campaigns: "0",
+    task_completion: "0",
+    user_rating: "0"
   });
 
   useEffect(() => {
     const fetchStats = () => {
-      fetch('https://sevasetu-bnup.onrender.com/api/v1/analytics/public-stats')
+      fetch('https://sevasetu-bnup.onrender.com/api/v1/analytics/public-stats?t=' + Date.now())
         .then(res => res.json())
         .then(data => {
           setStats({
-            active_volunteers: data.active_volunteers.toLocaleString(),
-            active_campaigns: data.active_campaigns.toLocaleString(),
-            task_completion: data.task_completion.toString(),
-            user_rating: data.user_rating.toString()
+            active_volunteers: (data.active_volunteers || 0).toLocaleString(),
+            active_campaigns: (data.active_campaigns || 0).toLocaleString(),
+            task_completion: (data.task_completion || 0).toString(),
+            user_rating: (data.user_rating || 0).toString()
           });
         })
         .catch(err => console.error("Error fetching stats:", err));
