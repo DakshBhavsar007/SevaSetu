@@ -48,8 +48,9 @@ export default function ProfilePage() {
         vehicle_type: prof.vehicle_type || 'none',
         address: prof.address || '',
       });
-    } catch {
-      // Profile not set up yet
+    } catch (err) {
+      // Profile not set up yet, which is fine for first-time view
+      console.log("No profile found yet, user needs to set it up.");
     }
     setLoading(false);
   }
