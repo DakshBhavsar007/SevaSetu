@@ -8,14 +8,8 @@ export const Logo = ({ height = '120px', scrolled = false }) => (
     alignItems: 'center',
     justifyContent: 'center',
     // Rounded white card when scrolled over white bg; clean pill over dark hero
-    background: scrolled ? 'transparent' : 'rgba(255,255,255,0.12)',
-    backdropFilter: scrolled ? 'none' : 'blur(8px)',
-    WebkitBackdropFilter: scrolled ? 'none' : 'blur(8px)',
-    borderRadius: '16px',
-    padding: scrolled ? '0' : '6px 10px',
-    border: scrolled ? 'none' : '1px solid rgba(255,255,255,0.25)',
+    background: 'transparent',
     transition: 'all 0.4s ease',
-    boxShadow: scrolled ? 'none' : '0 4px 20px rgba(0,0,0,0.2)',
   }}>
     <img
       src="/LOGO.png"
@@ -29,7 +23,6 @@ export const Logo = ({ height = '120px', scrolled = false }) => (
         // Transparent logo styles
         mixBlendMode: 'normal',
         filter: 'none',
-        transform: 'scale(1.4)',
       }}
     />
   </div>
@@ -78,7 +71,7 @@ const Navbar = ({ onNavigate }) => {
         whileHover={{ opacity: 0.88, scale: 1.02 }}
         transition={{ duration: 0.2 }}
       >
-        <Logo height={scrolled ? '80px' : '120px'} scrolled={scrolled} />
+        <Logo height={scrolled ? '45px' : '55px'} scrolled={scrolled} />
       </motion.button>
 
       <div className="nav-center">
@@ -103,8 +96,8 @@ const Navbar = ({ onNavigate }) => {
                 fontSize: '14px',
                 fontWeight: isActive ? '700' : '500',
                 color: isActive
-                  ? (scrolled ? '#3b82f6' : '#fbbf24')
-                  : (scrolled ? '#1a1c1e' : 'rgba(255,255,255,0.85)'),
+                  ? '#3b82f6'
+                  : '#1a1c1e',
                 padding: '8px 12px'
               }}
               whileHover={{ y: isActive ? 0 : -1 }}
@@ -120,7 +113,7 @@ const Navbar = ({ onNavigate }) => {
                     left: '10%',
                     right: '10%',
                     height: '2px',
-                    background: scrolled ? '#3b82f6' : '#f59e0b',
+                    background: '#3b82f6',
                     borderRadius: '2px'
                   }}
                   transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
@@ -133,7 +126,7 @@ const Navbar = ({ onNavigate }) => {
 
       <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <motion.button
-          className={scrolled ? 'install-app-btn' : 'install-app-btn install-app-btn-light'}
+          className="install-app-btn"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleInstallApp}
@@ -146,7 +139,7 @@ const Navbar = ({ onNavigate }) => {
           Install App
         </motion.button>
         <motion.button
-          className={scrolled ? 'dashboard-btn' : 'dashboard-btn dashboard-btn-light'}
+          className="dashboard-btn"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handleDashboard}

@@ -7,21 +7,19 @@
   top: 0;
   left: 0;
   right: 0;
-  /* Must use rgba, NOT 'transparent' keyword, for CSS transition to work */
-  background-color: rgba(0, 0, 0, 0);
-  height: 120px;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  height: 90px;
   z-index: 1000;
-  transition: background-color 0.45s ease, height 0.35s ease, box-shadow 0.35s ease;
+  transition: all 0.35s ease;
 }
 
 /* Scrolled state: frosted white bar */
 .navbar.scrolled {
-  background-color: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  box-shadow: 0 2px 24px rgba(0,0,0,0.08);
-  height: 96px;
+  height: 80px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
 .nav-left {
