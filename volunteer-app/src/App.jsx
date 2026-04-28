@@ -27,7 +27,7 @@ function AuthProvider({ children }) {
       if (res.is_new_user) {
         try {
           await volunteerApi.setup({
-            phone: "", skills: ["General Support"], has_vehicle: false,
+            phone: "", skills: ["logistics"], has_vehicle: false,
             vehicle_type: "none", latitude: 0, longitude: 0, address: ""
           });
         } catch (e) { console.error("Auto-setup failed:", e); }
@@ -59,7 +59,7 @@ function AuthProvider({ children }) {
       // Setup volunteer profile immediately
       try {
         await volunteerApi.setup({
-          phone: "", skills: ["General Support"], has_vehicle: false,
+          phone: "", skills: ["logistics"], has_vehicle: false,
           vehicle_type: "none", latitude: 0, longitude: 0, address: ""
         });
       } catch (e) { console.error("Initial profile setup failed:", e); }
@@ -121,11 +121,10 @@ function TopBar() {
         src="/LOGO.png"
         alt="SevaSetu"
         style={{
-          height: '100px',
+          height: '60px',
           width: 'auto',
           objectFit: 'contain',
           imageRendering: '-webkit-optimize-contrast',
-          transform: 'scale(1.3)',
         }}
       />
     </header>
