@@ -401,7 +401,7 @@ async def get_public_showcase(db: Session = Depends(get_db)):
                 skills_list = json.loads(vol.skills)
                 if isinstance(skills_list, list):
                     skills = skills_list[:3]
-            except:
+            except Exception:
                 pass
                 
         # Generate initials

@@ -83,12 +83,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://sevasetu-volunteer.onrender.com",
-        "https://sevasetu-admin.onrender.com",
-        "http://localhost:5173",
-        "http://localhost:3000",
-    ],
+    allow_origins=settings.cors_origins,
     allow_credentials=True,  # ✅ Ab kaam karega
     allow_methods=["*"],
     allow_headers=["*"],
