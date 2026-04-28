@@ -217,6 +217,13 @@ export default function VolunteersPage() {
     offline: data.filter(v => v.availability === 'offline').length,
   };
 
+  const statusChips = [
+    { key: '',          label: 'All',       count: counts.all,       color: 'var(--accent)'     },
+    { key: 'available', label: 'Available', count: counts.available, color: '#10b981'            },
+    { key: 'busy',      label: 'Busy',      count: counts.busy,      color: '#f59e0b'            },
+    { key: 'offline',   label: 'Offline',   count: counts.offline,   color: 'var(--text-muted)' },
+  ];
+
   return (
     <>
       <div className="page-header">
@@ -264,12 +271,7 @@ export default function VolunteersPage() {
 
         {/* Summary stat chips */}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-          {[
-            { key: '',          label: 'All',       count: counts.all,       color: 'var(--accent)'       },
-            { key: 'available', label: 'Available', count: counts.available, color: '#10b981'              },
-            { key: 'busy',      label: 'Busy',      count: counts.busy,      color: '#f59e0b'              },
-            { key: 'offline',   label: 'Offline',   count: counts.offline,   color: 'var(--text-muted)'   },
-          ].map(chip => (
+          {statusChips.map(chip => (
             <button key={chip.key} onClick={() => setFilter(chip.key)} style={{
               display: 'inline-flex', alignItems: 'center', gap: '6px',
               padding: '6px 14px', borderRadius: '20px', cursor: 'pointer',
