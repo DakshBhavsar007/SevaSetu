@@ -174,14 +174,12 @@ export default function VolunteersPage() {
     // Auto-refresh every 15 seconds to catch new registrations
     pollRef.current = setInterval(() => loadVolunteers(true), 15000);
     return () => clearInterval(pollRef.current);
-  }, [filter]);
+  }, []); // Only fetch on mount and refresh, not on filter change
 
   async function loadVolunteers(silent = false) {
     if (!silent) setLoading(true);
     try {
-      const params = {};
-      if (filter) params.availability = filter;
-      const res = await volunteers.list(params);
+      const res = await volunteers.list();
 
       // Detect newly added volunteers
       const currentIds = new Set(res.map(v => v.id));
@@ -198,13 +196,17 @@ export default function VolunteersPage() {
   }
 
   const filtered = data.filter(v => {
+    // 1. Status Filter
+    if (filter && v.availability !== filter) return false;
+
+    // 2. Search Filter
     if (!search) return true;
     const q = search.toLowerCase();
     return (
       (v.user_name || '').toLowerCase().includes(q) ||
       (v.user_email || '').toLowerCase().includes(q) ||
       (v.address || '').toLowerCase().includes(q) ||
-      (v.skills || []).some(s => s.includes(q))
+      (v.skills || []).some(s => s.toLowerCase().includes(q))
     );
   });
 
