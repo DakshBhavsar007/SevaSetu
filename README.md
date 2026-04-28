@@ -16,7 +16,7 @@
 > A full-stack, real-time platform that bridges **NGOs, admins, and volunteers** during disasters — with AI-powered matching, live maps, OCR scanning, and weather-based alerts.
 
 <br>
-<img src="./landing_page/src/assets/hero-image.png" alt="SevaSetu Platform" width="100%"/>
+<img src="./landing_page/src/assets/hero-image.jpeg" alt="SevaSetu Platform" width="100%"/>
 
 </div>
 
