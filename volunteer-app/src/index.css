@@ -409,8 +409,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   padding: 40px;
   color: var(--text-secondary);
+  gap: 12px;
 }
 
 .vol-spinner {
@@ -423,6 +425,19 @@ body {
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Fade-slide-up for profile cards */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Toast animation */
+@keyframes toastIn {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
 
 /* ============================================
    Premium Onboarding Tour Theme (driver.js)

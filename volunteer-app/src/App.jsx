@@ -17,22 +17,33 @@ function AuthProvider({ children }) {
   const [user, setUser] = useState(getStoredUser());
   const [loading, setLoading] = useState(false);
 
+  const ensureVolunteerProfile = async () => {
+    try {
+      await volunteerApi.getMyProfile();
+      // Profile exists — nothing to do
+    } catch (e) {
+      // apiFetch throws plain Error; check for 404 or "not set up" message
+      const msg = (e.message || '').toLowerCase();
+      if (msg.includes('404') || msg.includes('not set up') || msg.includes('not found') || msg.includes('volunteer profile')) {
+        try {
+          await volunteerApi.setup({
+            phone: '', skills: ['logistics'], has_vehicle: false,
+            vehicle_type: 'none', latitude: 0, longitude: 0, address: '',
+          });
+          console.log('✅ Volunteer profile auto-created in DB');
+        } catch (setupError) {
+          console.error('Auto volunteer profile setup failed:', setupError);
+        }
+      }
+    }
+  };
+
   const login = async (token, role) => {
     setLoading(true);
     try {
       const res = await authApi.googleLogin(token, role);
       setToken(res.access_token);
-      
-      // Auto-setup profile if new user
-      if (res.is_new_user) {
-        try {
-          await volunteerApi.setup({
-            phone: "", skills: ["logistics"], has_vehicle: false,
-            vehicle_type: "none", latitude: 0, longitude: 0, address: ""
-          });
-        } catch (e) { console.error("Auto-setup failed:", e); }
-      }
-
+      await ensureVolunteerProfile();
       setStoredUser(res.user);
       setUser(res.user);
       return res;
@@ -44,6 +55,7 @@ function AuthProvider({ children }) {
     try {
       const res = await authApi.emailLogin(email, password);
       setToken(res.access_token);
+      await ensureVolunteerProfile();
       setStoredUser(res.user);
       setUser(res.user);
       return res;
@@ -55,15 +67,7 @@ function AuthProvider({ children }) {
     try {
       const res = await authApi.emailRegister(email, password, name);
       setToken(res.access_token);
-
-      // Setup volunteer profile immediately
-      try {
-        await volunteerApi.setup({
-          phone: "", skills: ["logistics"], has_vehicle: false,
-          vehicle_type: "none", latitude: 0, longitude: 0, address: ""
-        });
-      } catch (e) { console.error("Initial profile setup failed:", e); }
-
+      await ensureVolunteerProfile();
       setStoredUser(res.user);
       setUser(res.user);
       return res;
