@@ -423,3 +423,142 @@ body {
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================
+   Premium Onboarding Tour Theme (driver.js)
+   ============================================ */
+
+/* Popover card */
+.driver-popover.premium-tour-theme {
+  background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(248,250,255,0.98));
+  color: #1a1c1e;
+  border-radius: 20px;
+  border: 1px solid rgba(59,130,246,0.15);
+  box-shadow:
+    0 20px 60px rgba(59,130,246,0.12),
+    0 8px 24px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.9);
+  padding: 24px 26px 20px;
+  font-family: var(--font-sans);
+  max-width: 360px;
+  backdrop-filter: blur(20px);
+  animation: tourPopIn 0.35s cubic-bezier(0.21, 0.45, 0.32, 1.2);
+}
+
+[data-theme="dark"] .driver-popover.premium-tour-theme {
+  background: linear-gradient(135deg, rgba(21,26,37,0.96), rgba(19,23,32,0.98));
+  color: #ffffff;
+  border-color: rgba(59,130,246,0.2);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.4),
+    0 8px 24px rgba(59,130,246,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+@keyframes tourPopIn {
+  0%   { opacity: 0; transform: scale(0.92) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Highlighted overlay glow */
+.driver-overlay.premium-tour-theme {
+  background: rgba(15, 23, 42, 0.55) !important;
+  backdrop-filter: blur(3px);
+}
+
+/* Title */
+.driver-popover.premium-tour-theme .driver-popover-title {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.01em;
+}
+
+/* Description */
+.driver-popover.premium-tour-theme .driver-popover-description {
+  font-size: 13.5px;
+  color: #475569;
+  line-height: 1.65;
+  margin-bottom: 4px;
+}
+
+[data-theme="dark"] .driver-popover.premium-tour-theme .driver-popover-description {
+  color: #94a3b8;
+}
+
+/* Progress text */
+.driver-popover.premium-tour-theme .driver-popover-progress-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.02em;
+}
+
+/* All buttons base */
+.driver-popover.premium-tour-theme .driver-popover-footer button {
+  border-radius: 10px;
+  padding: 9px 18px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.01em;
+}
+
+/* Next / Done button */
+.driver-popover.premium-tour-theme .driver-popover-next-btn {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  color: white !important;
+  text-shadow: none !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.35);
+}
+.driver-popover.premium-tour-theme .driver-popover-next-btn:hover {
+  box-shadow: 0 6px 20px rgba(59,130,246,0.5) !important;
+  transform: translateY(-1px);
+}
+
+/* Previous button */
+.driver-popover.premium-tour-theme .driver-popover-prev-btn {
+  background: rgba(59,130,246,0.06) !important;
+  border: 1.5px solid rgba(59,130,246,0.2) !important;
+  color: #3b82f6 !important;
+}
+.driver-popover.premium-tour-theme .driver-popover-prev-btn:hover {
+  background: rgba(59,130,246,0.12) !important;
+  border-color: rgba(59,130,246,0.35) !important;
+}
+
+[data-theme="dark"] .driver-popover.premium-tour-theme .driver-popover-prev-btn {
+  background: rgba(59,130,246,0.1) !important;
+  border-color: rgba(59,130,246,0.25) !important;
+  color: #93c5fd !important;
+}
+
+/* Close button */
+.driver-popover.premium-tour-theme .driver-popover-close-btn {
+  color: #94a3b8 !important;
+  font-size: 18px;
+  transition: color 0.2s;
+}
+.driver-popover.premium-tour-theme .driver-popover-close-btn:hover {
+  color: #ef4444 !important;
+}
+
+/* Arrow */
+.driver-popover.premium-tour-theme .driver-popover-arrow {
+  border: 5px solid transparent;
+}
+.driver-popover.premium-tour-theme .driver-popover-arrow-side-left { border-right-color: rgba(248,250,255,0.98); }
+.driver-popover.premium-tour-theme .driver-popover-arrow-side-right { border-left-color: rgba(248,250,255,0.98); }
+.driver-popover.premium-tour-theme .driver-popover-arrow-side-top { border-bottom-color: rgba(248,250,255,0.98); }
+.driver-popover.premium-tour-theme .driver-popover-arrow-side-bottom { border-top-color: rgba(248,250,255,0.98); }
+
+[data-theme="dark"] .driver-popover.premium-tour-theme .driver-popover-arrow-side-left { border-right-color: rgba(21,26,37,0.96); }
+[data-theme="dark"] .driver-popover.premium-tour-theme .driver-popover-arrow-side-right { border-left-color: rgba(21,26,37,0.96); }
+[data-theme="dark"] .driver-popover.premium-tour-theme .driver-popover-arrow-side-top { border-bottom-color: rgba(21,26,37,0.96); }
+[data-theme="dark"] .driver-popover.premium-tour-theme .driver-popover-arrow-side-bottom { border-top-color: rgba(21,26,37,0.96); }

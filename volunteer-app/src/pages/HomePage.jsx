@@ -3,6 +3,8 @@ import { useAuth } from '../App';
 import { volunteer } from '../services/api';
 import { Hand, Star, ClipboardList, CheckCircle2, Zap, AlertTriangle, Settings, Stethoscope, Utensils, Home, Droplets, Siren, BookOpen, Shirt, Trash2, ArrowRight } from 'lucide-react';
 import DisasterBanner from './DisasterBanner';
+import { driver } from 'driver.js';
+import 'driver.js/dist/driver.css';
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -24,6 +26,67 @@ export default function HomePage() {
     setLoading(false);
   }
 
+  useEffect(() => {
+    if (!loading && !localStorage.getItem('volunteer_tour_done')) {
+      const driverObj = driver({
+        showProgress: true,
+        animate: true,
+        smoothScroll: true,
+        stagePadding: 6,
+        stageRadius: 12,
+        popoverClass: 'premium-tour-theme',
+        overlayColor: 'rgba(15, 23, 42, 0.55)',
+        nextBtnText: 'Next →',
+        prevBtnText: '← Back',
+        doneBtnText: "Let's Go! 🚀",
+        progressText: '{{current}} of {{total}}',
+        steps: [
+          {
+            element: '#home-header',
+            popover: {
+              title: '👋 Welcome to Your Dashboard!',
+              description: 'This is your personal command center — see your availability status, stats at a glance, and jump into action from here.',
+              side: 'bottom', align: 'start'
+            }
+          },
+          {
+            element: '#quick-actions-section',
+            popover: {
+              title: '⚡ Quick Actions',
+              description: 'Spot an emergency? Need to update your profile? These shortcuts get you there instantly — no navigation needed.',
+              side: 'top', align: 'start'
+            }
+          },
+          {
+            element: '#active-tasks-section',
+            popover: {
+              title: '📋 Your Active Tasks',
+              description: 'Tasks assigned to you by the admin will show up right here. Accept, start, or complete them — all in one place.',
+              side: 'top', align: 'start'
+            }
+          },
+          {
+            element: '.bottom-nav',
+            popover: {
+              title: '🧭 Navigate Like a Pro',
+              description: 'Use this bar to explore the Crisis Map, browse all Tasks, report emergencies, or edit your Profile.',
+              side: 'top', align: 'center'
+            }
+          }
+        ],
+        onDestroyStarted: () => {
+          if (!driverObj.hasNextStep() || window.confirm('Are you sure you want to skip the tour?')) {
+            driverObj.destroy();
+            localStorage.setItem('volunteer_tour_done', 'true');
+          }
+        },
+      });
+      setTimeout(() => {
+        driverObj.drive();
+      }, 600);
+    }
+  }, [loading]);
+
   const catIcons = { medical: Stethoscope, food: Utensils, shelter: Home, water: Droplets, rescue: Siren, education: BookOpen, clothing: Shirt, sanitation: Trash2, other: ClipboardList };
 
   if (loading) return <div className="vol-loading" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: '12px' }}><div className="vol-spinner" style={{ width: '40px', height: '40px', borderWidth: '3px' }}></div><span style={{ fontSize: '18px', fontWeight: '600', color: 'var(--accent)' }}>Waking up systems...</span></div>;
@@ -31,7 +94,7 @@ export default function HomePage() {
   return (
     <>
       {/* Dynamic Header */}
-      <div style={{
+      <div id="home-header" style={{
         padding: '20px 20px 24px',
         background: 'linear-gradient(135deg, var(--bg-card), var(--bg-primary))',
         borderBottom: '1px solid var(--border-color)',
@@ -116,7 +179,7 @@ export default function HomePage() {
         )}
 
         {/* Quick Actions (Modern Tiles) */}
-        <div>
+        <div id="quick-actions-section">
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
             <Zap size={18} color="var(--accent-purple)" /> Quick Actions
           </h3>
@@ -162,7 +225,7 @@ export default function HomePage() {
         </div>
 
         {/* Active Tasks list */}
-        <div>
+        <div id="active-tasks-section">
           <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)' }}>
             <ClipboardList size={18} color="var(--accent)" /> Active Tasks {tasks.length > 0 && <span style={{ background: 'var(--accent)', color: '#fff', fontSize: '11px', padding: '2px 8px', borderRadius: '12px' }}>{tasks.length}</span>}
           </h3>
