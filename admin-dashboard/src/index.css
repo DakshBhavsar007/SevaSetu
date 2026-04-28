@@ -921,3 +921,29 @@ tbody tr:last-child td {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================
+   MAPLIBRE CONTROLS DARK MODE
+   ============================================ */
+[data-theme="dark"] .maplibregl-ctrl-group {
+  background: rgba(21, 26, 37, 0.9);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .maplibregl-ctrl-group > button {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+[data-theme="dark"] .maplibregl-ctrl-attrib {
+  background: rgba(21, 26, 37, 0.85);
+  color: var(--text-muted);
+}
+[data-theme="dark"] .maplibregl-ctrl-attrib a {
+  color: var(--accent);
+}
+[data-theme="dark"] .maplibregl-ctrl-scale {
+  background: rgba(21, 26, 37, 0.85);
+  color: var(--text-muted);
+  border-color: rgba(255, 255, 255, 0.2);
+}

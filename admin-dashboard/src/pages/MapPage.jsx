@@ -29,6 +29,8 @@ export default function MapPage() {
   const [searching, setSearching] = useState(false);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [is3D, setIs3D] = useState(false);
+  const [theme, setTheme] = useState(document.documentElement.getAttribute('data-theme') || 'light');
+  const mapStyleRef = useRef(theme === 'dark' ? 'https://tiles.openfreemap.org/styles/dark' : 'https://tiles.openfreemap.org/styles/liberty');
 
   // Weather state
   const [showWeather, setShowWeather] = useState(false);
@@ -38,6 +40,37 @@ export default function MapPage() {
   const [mapCenter, setMapCenter] = useState({ lat: INDIA_CENTER.lat, lng: INDIA_CENTER.lng });
 
   useEffect(() => { loadMapData(); }, [filter]);
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setTheme(document.documentElement.getAttribute('data-theme') || 'light');
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    if (!map) return;
+
+    const newStyle = theme === 'dark'
+      ? 'https://tiles.openfreemap.org/styles/dark'
+      : 'https://tiles.openfreemap.org/styles/liberty';
+
+    if (mapStyleRef.current === newStyle) return;
+    mapStyleRef.current = newStyle;
+
+    setIsMapLoaded(false);
+    map.setStyle(newStyle);
+
+    map.once('style.load', () => {
+      setIsMapLoaded(true);
+      if (map.getLayer('building-3d')) {
+        map.setLayoutProperty('building-3d', 'visibility', map.getPitch() > 0 ? 'visible' : 'none');
+        map.setPaintProperty('building-3d', 'fill-extrusion-opacity', 0.88);
+      }
+    });
+  }, [theme]);
 
   useEffect(() => {
     pollRef.current = setInterval(() => { loadMapData(); }, 30000);
@@ -86,7 +119,7 @@ export default function MapPage() {
 
     const map = new maplibregl.Map({
       container: mapRef.current,
-      style: 'https://tiles.openfreemap.org/styles/liberty', // This style has building-3d layer
+      style: mapStyleRef.current, // Use dynamic style based on initial theme
       center: [73.5, 22.0],
       zoom: 6,
       minZoom: 3,
@@ -225,7 +258,7 @@ export default function MapPage() {
       }
 
       let urgencyHtml = '<div style="display:flex;gap:2px;margin-top:2px;">';
-      for(let i=1; i<=5; i++) {
+      for (let i = 1; i <= 5; i++) {
         urgencyHtml += `<div style="width:6px;height:6px;border-radius:50%;background:${i <= need.urgency ? '#EF4444' : '#ccc'}"></div>`;
       }
       urgencyHtml += '</div>';
@@ -271,7 +304,7 @@ export default function MapPage() {
         bearing: -20,
         zoom: targetZoom,
         duration: 1400,
-        easing: t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t
+        easing: t => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
       });
       if (map.getLayer('building-3d')) {
         map.setLayoutProperty('building-3d', 'visibility', 'visible');
@@ -305,11 +338,11 @@ export default function MapPage() {
   function flyToLocation(lat, lon, name) {
     const map = mapInstanceRef.current;
     if (!map) return;
-    
+
     map.flyTo({ center: [lon, lat], zoom: 14, duration: 1500 });
-    
+
     if (searchMarkerRef.current) searchMarkerRef.current.remove();
-    
+
     const el = document.createElement('div');
     el.style.width = '24px';
     el.style.height = '24px';
@@ -317,14 +350,14 @@ export default function MapPage() {
     el.style.backgroundColor = '#FBBF24';
     el.style.border = '3px solid #F59E0B';
     el.style.boxShadow = '0 0 10px rgba(245,158,11,0.6)';
-    
+
     searchMarkerRef.current = new maplibregl.Marker({ element: el })
       .setLngLat([lon, lat])
       .setPopup(new maplibregl.Popup({ offset: 15 }).setHTML(`<b>Location: ${name}</b>`))
       .addTo(map);
-      
+
     searchMarkerRef.current.togglePopup();
-    
+
     setSearchQuery(name);
     setSearchResults([]);
     if (showWeather) loadWeatherAlert({ lat, lng: lon });
@@ -546,69 +579,69 @@ export default function MapPage() {
             <div ref={mapRef} style={{ height: '100%', width: '100%', zIndex: 1 }}></div>
 
             {/* Stats Panel */}
-          <div style={{
-            position: 'absolute', top: '16px', right: '16px', background: 'rgba(255,255,255,0.95)',
-            border: '1px solid var(--border-color)', borderRadius: '10px', padding: '14px 16px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.1)', backdropFilter: 'blur(8px)', zIndex: 500, minWidth: '180px',
-            color: 'var(--text-primary)'
-          }}>
-            <h4 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 10px 0' }}>Active Needs</h4>
-            {categories.map(cat => {
-              const count = mapNeeds.filter(n => n.category === cat).length;
-              const catColors = {
-                medical: '#EF4444', food: '#F97316', shelter: '#3B82F6',
-                water: '#06B6D4', rescue: '#A855F7', education: '#10B981',
-                clothing: '#EAB308', sanitation: '#14B8A6',
-              };
-              return (
-                <div key={cat} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', fontSize: '12px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'capitalize' }}>
+            <div style={{
+              position: 'absolute', top: '16px', right: '16px', background: theme === 'dark' ? 'rgba(21, 26, 37, 0.85)' : 'rgba(255,255,255,0.95)',
+              border: '1px solid var(--border-color)', borderRadius: '10px', padding: '14px 16px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.1)', backdropFilter: 'blur(8px)', zIndex: 500, minWidth: '180px',
+              color: 'var(--text-primary)'
+            }}>
+              <h4 style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 10px 0' }}>Active Needs</h4>
+              {categories.map(cat => {
+                const count = mapNeeds.filter(n => n.category === cat).length;
+                const catColors = {
+                  medical: '#EF4444', food: '#F97316', shelter: '#3B82F6',
+                  water: '#06B6D4', rescue: '#A855F7', education: '#10B981',
+                  clothing: '#EAB308', sanitation: '#14B8A6',
+                };
+                return (
+                  <div key={cat} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px', fontSize: '12px' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', textTransform: 'capitalize' }}>
+                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: catColors[cat] || '#6B7280' }}></span>
+                      {cat}
+                    </span>
+                    <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Floating Legend */}
+            <div style={{
+              position: 'absolute', bottom: '28px', left: '16px', background: theme === 'dark' ? 'rgba(21, 26, 37, 0.85)' : 'rgba(255,255,255,0.95)',
+              border: '1px solid var(--border-color)', borderRadius: '10px', padding: '10px 14px',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.1)', backdropFilter: 'blur(8px)', display: 'flex', flexWrap: 'wrap',
+              gap: '8px 14px', maxWidth: '560px', zIndex: 500, color: 'var(--text-primary)'
+            }}>
+              {categories.map(cat => {
+                const catColors = {
+                  medical: '#EF4444', food: '#F97316', shelter: '#3B82F6',
+                  water: '#06B6D4', rescue: '#A855F7', education: '#10B981',
+                  clothing: '#EAB308', sanitation: '#14B8A6',
+                };
+                return (
+                  <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 500, textTransform: 'capitalize' }}>
                     <span style={{ width: 8, height: 8, borderRadius: '50%', background: catColors[cat] || '#6B7280' }}></span>
                     {cat}
-                  </span>
-                  <span style={{ fontFamily: 'monospace', fontWeight: 500 }}>{count}</span>
+                  </div>
+                );
+              })}
+              <div style={{ width: '1px', background: 'var(--border-color)', alignSelf: 'stretch' }}></div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid #6b7280', background: 'transparent' }}></span>
+                Large = High urgency
+              </div>
+              {is3D && (
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  🏢 3D buildings visible at zoom 14+
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Floating Legend */}
-          <div style={{
-            position: 'absolute', bottom: '28px', left: '16px', background: 'rgba(255,255,255,0.95)',
-            border: '1px solid var(--border-color)', borderRadius: '10px', padding: '10px 14px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.1)', backdropFilter: 'blur(8px)', display: 'flex', flexWrap: 'wrap',
-            gap: '8px 14px', maxWidth: '560px', zIndex: 500, color: 'var(--text-primary)'
-          }}>
-            {categories.map(cat => {
-              const catColors = {
-                medical: '#EF4444', food: '#F97316', shelter: '#3B82F6',
-                water: '#06B6D4', rescue: '#A855F7', education: '#10B981',
-                clothing: '#EAB308', sanitation: '#14B8A6',
-              };
-              return (
-                <div key={cat} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 500, textTransform: 'capitalize' }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: catColors[cat] || '#6B7280' }}></span>
-                  {cat}
+              )}
+              {showWeather && (
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <CloudRain size={12} color="var(--accent)" /> Weather active
                 </div>
-              );
-            })}
-            <div style={{ width: '1px', background: 'var(--border-color)', alignSelf: 'stretch' }}></div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <span style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid #6b7280', background: 'transparent' }}></span>
-              Large = High urgency
+              )}
             </div>
-            {is3D && (
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                🏢 3D buildings visible at zoom 14+
-              </div>
-            )}
-            {showWeather && (
-              <div style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <CloudRain size={12} color="var(--accent)" /> Weather active
-              </div>
-            )}
           </div>
-        </div>
         </div>
       </div>
     </>
